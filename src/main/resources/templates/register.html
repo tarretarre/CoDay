@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Ny användare</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .error {
+            color: red;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .form-field {
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+    <h1 class="mb-4">Skapa ny användare</h1>
+
+    <form th:action="@{/create-user}" th:object="${user}" method="post">
+        <input type="hidden" th:field="*{company.id}" />
+
+        <div class="form-field">
+            <label>Förnamn</label>
+            <input type="text" th:field="*{firstName}" class="form-control" placeholder="Förnamn" required />
+            <span class="error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
+        </div>
+
+        <div class="form-field">
+            <label>Efternamn</label>
+            <input type="text" th:field="*{lastName}" class="form-control" placeholder="Efternamn" required />
+            <span class="error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
+        </div>
+
+        <div class="form-field">
+            <label>E-postadress</label>
+            <input type="email" th:field="*{email}" class="form-control" placeholder="E-postadress" required />
+            <span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+        </div>
+
+        <div class="form-field">
+            <label>Personnummer (10 eller 12 siffror)</label>
+            <input type="text" th:field="*{ssn}" class="form-control" placeholder="ÅÅÅÅMMDDXXXX" required />
+            <span class="error" th:if="${#fields.hasErrors('ssn')}" th:errors="*{ssn}"></span>
+        </div>
+
+        <div class="form-field">
+            <label>Lösenord</label>
+            <input type="password" th:field="*{password}" class="form-control" placeholder="Lösenord" required />
+            <span class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+        </div>
+
+        <div class="form-field">
+            <label>Kommentar (ex. vad har du för roll på företag? Admin eller användare?)</label>
+            <textarea th:field="*{adminComment}" class="form-control" rows="3" placeholder="Exempel: Jag är ansvarig för vårt kontorsprogram..."></textarea>
+            <span class="error" th:if="${#fields.hasErrors('adminComment')}" th:errors="*{adminComment}"></span>
+        </div>
+
+        <h4 class="mt-4">Adress</h4>
+
+        <div class="form-field">
+            <label>Gatuadress</label>
+            <input type="text" th:field="*{address.streetAddress}" class="form-control" placeholder="Exempelgatan 1" required />
+        </div>
+
+        <div class="form-field">
+            <label>Postnummer</label>
+            <input type="text" th:field="*{address.postalCode}" class="form-control" placeholder="123 45" required />
+        </div>
+
+        <div class="form-field">
+            <label>Ort</label>
+            <input type="text" th:field="*{address.city}" class="form-control" placeholder="Stockholm" required />
+        </div>
+
+        <div class="d-flex gap-3 mt-4">
+            <button type="submit" class="btn btn-primary">Registrera</button>
+            <button type="reset" class="btn btn-secondary">Rensa</button>
+        </div>
+    </form>
+
+    <div class="mt-4">
+        <a href="/" style="text-decoration:none;">← Tillbaka till startsidan</a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

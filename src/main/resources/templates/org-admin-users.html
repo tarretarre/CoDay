@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <title>Användarhantering</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container py-5">
+  <h1 class="mb-4">Användare i företaget</h1>
+
+  <table class="table table-bordered">
+    <thead>
+    <tr>
+      <th>Namn</th>
+      <th>E-post</th>
+      <th>Roll</th>
+      <th>Åtgärd</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${users}">
+      <form th:action="@{'/org-admin/users/' + ${user.id} + '/update-role'}" method="post">
+        <td th:text="${user.firstName + ' ' + user.lastName}"></td>
+        <td th:text="${user.email}"></td>
+        <td>
+          <select name="role" class="form-select">
+            <option th:value="USER" th:selected="${user.role == 'USER'}">User</option>
+            <option th:value="ORG_ADMIN" th:selected="${user.role == 'ORG_ADMIN'}">Företagsadmin</option>
+            <option th:value="ADMIN" th:selected="${user.role == 'ADMIN'}">Systemadmin</option>
+          </select>
+        </td>
+        <td><button type="submit" class="btn btn-sm btn-primary">Spara</button></td>
+      </form>
+    </tr>
+    </tbody>
+  </table>
+
+  <div class="mt-4">
+    <a href="/org-admin/dashboard" class="btn btn-outline-secondary">← Tillbaka</a>
+  </div>
+</div>
+</body>
+</html>
