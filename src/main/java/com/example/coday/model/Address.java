@@ -2,10 +2,15 @@ package com.example.coday.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import com.example.coday.util.PostalCodeUtil;
+
 import java.util.List;
 
 @Entity
-@Table(name = "addresses")
+@Table(
+        name = "addresses",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"street_address", "postal_code", "city"})
+)
 public class Address {
 
     @Id
@@ -26,7 +31,7 @@ public class Address {
     @OneToMany(mappedBy = "address")
     private List<User> users;
 
-    @ManyToMany(mappedBy = "addresses")
+    @OneToMany(mappedBy = "address")
     private List<Company> companies;
 
     public Address() {}
@@ -58,8 +63,9 @@ public class Address {
     }
 
     public void setPostalCode(String postalCode) {
-        this.postalCode = postalCode;
+        this.postalCode = PostalCodeUtil.formatPostalCode(postalCode);
     }
+
 
     public String getCity() {
         return city;

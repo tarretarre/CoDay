@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 283.46 283.46">
+  <defs>
+    <style>
+      .cls-1 {
+        letter-spacing: -.04em;
+      }
+
+      .cls-2 {
+        fill: #1d1d1b;
+        font-family: BankGothicBT-Medium, 'BankGothic Md BT';
+        font-size: 31.5px;
+        font-weight: 500;
+      }
+
+      .cls-3 {
+        letter-spacing: -.02em;
+      }
+    </style>
+  </defs>
+  <text class="cls-2" transform="translate(86.86 130.96)"><tspan class="cls-3" x="0" y="0">L</tspan><tspan x="20.97" y="0">unch</tspan><tspan x="-56.22" y="37.8">presentko</tspan><tspan class="cls-1" x="126.29" y="37.8">r</tspan><tspan x="145.64" y="37.8">t</tspan></text>
+</svg>

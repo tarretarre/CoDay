@@ -15,12 +15,20 @@ public class Product {
 
     private int pointsCost;
 
+    private String imageUrl;
+
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private Company company;
+
     public Product() {
     }
 
-    public Product(String name, int pointsCost) {
+    public Product(String name, int pointsCost, String imageUrl, Company company) {
         this.name = name;
         this.pointsCost = pointsCost;
+        this.imageUrl = imageUrl;
+        this.company = company;
     }
 
     public Long getId() {
@@ -35,6 +43,14 @@ public class Product {
         return pointsCost;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public Company getCompany() {
+        return company;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -45,5 +61,13 @@ public class Product {
 
     public void setPointsCost(int pointsCost) {
         this.pointsCost = pointsCost;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
     }
 }

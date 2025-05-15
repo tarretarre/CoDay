@@ -42,12 +42,12 @@ public class User {
     @Column(nullable = false)
     private Role role = Role.USER;
 
-    @ManyToOne
-    @JoinColumn(name = "company_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "company_id", nullable = false)
     private Company company;
 
-    @ManyToOne
-    @JoinColumn(name = "address_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "address_id", nullable = false)
     private Address address;
 
     @Column(name = "last_login")
@@ -64,7 +64,8 @@ public class User {
 
     public User() {}
 
-    // --- Getters & Setters ---
+    @Column(nullable = false)
+    private boolean approved = false;
 
     public Long getId() {
         return id;
@@ -174,5 +175,13 @@ public class User {
     public String getSanitizedSsn() {
         if (ssn == null) return null;
         return ssn.length() == 12 ? ssn.substring(2) : ssn;
+    }
+
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
     }
 }

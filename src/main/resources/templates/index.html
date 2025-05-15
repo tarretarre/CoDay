@@ -2,69 +2,179 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="sv">
 <head>
   <meta charset="UTF-8">
-  <title>Co Day</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>CoDay</title>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm mb-5">
-  <div class="container">
-    <a class="navbar-brand" href="/">Co Day</a>
-
-    <div class="ms-auto" th:if="${session.loggedInUser == null}">
-      <form class="d-flex" th:action="@{/login}" method="post">
-        <input class="form-control me-2" type="email" name="email" placeholder="E-post" required>
-        <input class="form-control me-2" type="password" name="password" placeholder="Lösenord" required>
-        <button class="btn btn-primary" type="submit">Logga in</button>
-      </form>
-    </div>
-
-    <div class="ms-auto d-flex align-items-center" th:if="${session.loggedInUser != null}">
-      <span class="me-3">
-        Inloggad som <strong th:text="${session.loggedInUser.firstName}">Användare</strong>
-      </span>
-      <a th:href="@{'/dashboard/' + ${session.loggedInUser.id}}" class="btn btn-outline-primary me-2">Dashboard</a>
-      <form th:action="@{/logout}" method="post">
-        <button class="btn btn-outline-danger" type="submit">Logga ut</button>
-      </form>
-    </div>
-  </div>
-</nav>
-
-<div class="container py-5">
-  <h1 class="mb-4 text-primary">Motivera närvaro på kontoret – samla poäng, få belöningar.</h1>
-
-  <div class="mb-5">
-    <p>
-      <strong>Co Day</strong> är en digital belöningsplattform där anställda samlar poäng genom att checka in på kontoret.
-      Dessa poäng kan sedan bytas mot produkter eller presentkort – ett roligt och enkelt sätt att öka närvaron och engagemanget.
-    </p>
-  </div>
-
-  <div class="mb-5">
-    <h2 class="h4">Så funkar det</h2>
-    <ol class="list-group list-group-numbered">
-      <li class="list-group-item">🏢 Checka in på kontoret</li>
-      <li class="list-group-item">⭐ Tjäna poäng</li>
-      <li class="list-group-item">🎁 Byt poäng mot belöningar</li>
-    </ol>
-  </div>
-
-  <div class="mb-5">
-    <h2 class="h4">Exempel på belöningar</h2>
-    <ul class="list-group">
-      <li class="list-group-item">🎧 Trådlösa hörlurar – 120 poäng</li>
-      <li class="list-group-item">🍕 Lunchpresentkort – 80 poäng</li>
-      <li class="list-group-item">🎫 Biobiljetter – 50 poäng</li>
-    </ul>
-  </div>
-
-  <div class="d-flex gap-3">
-    <a class="btn btn-primary" href="/register">Registrera användare</a>
-    <a class="btn btn-outline-secondary" href="/companies/apply">Registrera företag</a>
-  </div>
+<div class="header" id="myHeader">
+  <nav>
+    <a href="#home-section" class="home-btn">Hem</a>
+    <a href="#info-section" class="info-btn">Om Co Day</a>
+    <a href="#login-section" class="login-btn">Logga in</a>
+    <a href="#support-section" class="support-btn">Support</a>
+  </nav>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<main>
+  <section id="home-section" class="home-section">
+    <div class="logo-container">
+      <a href="/"><img src="coday-289.svg" alt="CoDay Logo" class="logo"></a>
+    </div>
+  </section>
+
+  <section id="info-section" class="info-section">
+    <div class="info-container">
+      <h3>Motivera närvaro på kontoret – samla poäng, få belöningar.</h3>
+
+      <p>
+        <strong>Co Day</strong> är en digital belöningsplattform där anställda samlar poäng genom att checka in på kontoret.
+        Dessa poäng kan sedan bytas mot produkter eller presentkort, eller det du som företagare tror dina anställda motiveras av – ett roligt och enkelt sätt att öka närvaron och engagemanget.
+      </p>
+
+      <div class="info-block">
+        <h4>Så funkar det</h4>
+        <ol class="custom-list">
+          <li>Checka in på kontoret</li>
+          <li>Tjäna poäng</li>
+          <li>Byt poäng mot belöningar</li>
+        </ol>
+      </div>
+
+      <div class="info-block">
+        <h4>Exempel på belöningar</h4>
+        <ul class="custom-list">
+          <li>Trådlösa hörlurar – 5000 poäng</li>
+          <li>Biobiljetter – 2500 poäng</li>
+          <li>Lunchpresentkort – 2000 poäng</li>
+        </ul>
+      </div>
+
+      <div class="button-group">
+        <a href="#join-section" class="apply-btn">Gå med</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="join-section" class="join-section">
+    <div class="join-container">
+      <h2>Ansök om företagskonto</h2>
+
+      <p>
+        Välkommen! Här kan du som representant för ett företag skicka in en ansökan för att gå med i Co Day-programmet.
+        Efter att du har skickat in ansökan kommer vi att granska den och återkomma med information om nästa steg.
+      </p>
+    </div>
+
+    <div id="join-container-form" class="join-container-form">
+      <form th:action="@{/companies/apply}" th:object="${companyRequest}" method="post" novalidate class="join-form" id="joinForm">
+        <div th:if="${error}" class="form-error" th:text="${error}"></div>
+        <div th:if="${success}" class="form-success" th:text="${success}"></div>
+
+        <div class="form-group">
+          <input type="text" th:field="*{name}" id="name" placeholder="Företagsnamn" required>
+          <div class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div><br>
+
+          <input type="text" th:field="*{orgNumber}" id="orgNumber" placeholder="Organisationsnummer (10 siffror)" required>
+          <div class="field-error" th:if="${#fields.hasErrors('orgNumber')}" th:errors="*{orgNumber}"></div>
+        </div>
+
+        <h3>Företagsadress</h3>
+
+        <div class="form-group">
+          <input type="text" th:field="*{addresses[0].streetAddress}" id="streetAddress" placeholder="Gatuadress" required>
+          <div class="field-error" th:if="${#fields.hasErrors('addresses[0].streetAddress')}" th:errors="*{addresses[0].streetAddress}"></div><br>
+
+          <input type="text" th:field="*{addresses[0].postalCode}" id="postalCode" placeholder="Postnummer" required>
+          <div class="field-error" th:if="${#fields.hasErrors('addresses[0].postalCode')}" th:errors="*{addresses[0].postalCode}"></div><br>
+
+          <input type="text" th:field="*{addresses[0].city}" id="city" placeholder="Postort" required>
+          <div class="field-error" th:if="${#fields.hasErrors('addresses[0].city')}" th:errors="*{addresses[0].city}"></div>
+        </div>
+
+        <h3>Kontaktuppgifter</h3>
+        <div class="form-group">
+          <input type="text" th:field="*{contactName}" placeholder="Kontaktperson" required>
+          <div class="field-error" th:errors="*{contactName}"></div><br>
+
+          <input type="email" th:field="*{contactEmail}" placeholder="E-postadress" required>
+          <div class="field-error" th:errors="*{contactEmail}"></div><br>
+
+          <input type="text" th:field="*{contactPhone}" placeholder="Telefonnummer">
+          <div class="field-error" th:errors="*{contactPhone}"></div><br>
+        </div>
+
+        <div class="button-group"><button type="submit" class="submit-btn">Skicka ansökan</button></div>
+        <div class="button-group"><button type="button" class="clear-btn" onclick="resetJoinForm()">Rensa</button></div>
+      </form>
+    </div>
+  </section>
+
+  <div id="successModal" class="modal" th:if="${success}">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <p>Tack för din ansökan! Vi återkommer via e-post när den är godkänd.</p>
+    </div>
+  </div>
+  <div id="errorModal" class="modal" th:if="${param.error}">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <p>Ogiltig e-postadress eller lösenord. Försök igen.</p>
+    </div>
+  </div>
+
+
+  <section id="login-section" class="login-section">
+    <h2>Logga in</h2>
+    <form th:action="@{/login}" method="post" class="login-form">
+    <input type="text" name="email" placeholder="E-postadress" required><br>
+      <input type="password" name="password" placeholder="Lösenord" required><br>
+      <button type="submit" class="submit-btn">Logga in</button>
+    </form>
+  </section>
+
+  <section id="support-section" class="support-section">
+    <h2>Support & Kontakt</h2>
+    <p>Har du frågor? Kontakta oss via support@coday.se</p>
+  </section>
+</main>
+
+<footer>
+  <div class="footer">Co Day 2025</div>
+</footer>
+
+<script>
+  function resetJoinForm() {
+    const form = document.getElementById('joinForm');
+    form.reset();
+    window.location.hash = '#join-section';
+  }
+
+  function closeModal() {
+    const success = document.getElementById("successModal");
+    const error = document.getElementById("errorModal");
+
+    if (success) success.style.display = "none";
+    if (error) error.style.display = "none";
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    const successModal = document.getElementById("successModal");
+    const errorModal = document.getElementById("errorModal");
+
+    if (successModal) {
+      setTimeout(() => {
+        closeModal();
+      }, 5000);
+    }
+
+    if (errorModal) {
+      window.location.hash = "#login-section";
+      setTimeout(() => {
+        closeModal();
+      }, 3000);
+    }
+  });
+</script>
 </body>
 </html>

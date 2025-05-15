@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="sv" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Min Sida – CoDay</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<div class="header" id="myHeader">
+    <nav>
+        <a href="#status-section" class="home-btn">Status</a>
+        <a href="#profile-section" class="login-btn">Min sida</a>
+        <a href="#history-section" class="home-btn">Historik</a>
+        <a href="#product-list-section" class="login-btn">Belöningar</a>
+        <a href="#purchases-section" class="login-btn">Inlösta belöningar</a>
+        <a href="#support-section" class="login-btn">Support</a>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="login-btn">Logga ut</button>
+        </form>
+    </nav>
+</div>
+
+<header>
+    <h1>Välkommen, [[${user.firstName}]]!</h1>
+    <p>Företag: [[${user.company.name}]]</p>
+</header>
+
+<main class="user-dashboard">
+
+    <div th:if="${success}" class="success-message" th:text="${success}"></div>
+    <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+    <section id="status-section" class="summary-section">
+        <h2>Din status</h2>
+        <div class="status-info">
+            <p>🏆 Totala poäng: <strong>[[${points}]]</strong></p>
+
+            <p th:if="${currentVisit != null}">
+                Status: <strong>Incheckad</strong> sedan [[${#temporals.format(currentVisit.checkInTime, 'yyyy-MM-dd HH:mm')}]]<br>
+                ⏱ Tid på plats: <strong id="time-counter">räknar...</strong>
+            </p>
+            <p th:if="${currentVisit == null}">
+                Status: <strong>Inte incheckad</strong>
+            </p>
+        </div>
+
+        <div class="button-group">
+            <form th:if="${currentVisit != null}" method="post" th:action="@{/visit/checkout}">
+                <button type="submit" class="check-btn check-out-btn">Checka ut</button>
+            </form>
+
+            <form th:unless="${currentVisit != null}" method="post" th:action="@{/visit/checkin}">
+                <button type="submit" class="check-btn check-in-btn">Checka in</button>
+            </form>
+        </div>
+    </section>
+
+    <section id="profile-section" class="profile-section">
+        <h2>Min profil</h2>
+
+        <div class="profile-info">
+            <p><strong>Namn:</strong> [[${user.firstName}]] [[${user.lastName}]]</p>
+            <p><strong>E-post:</strong> [[${user.email}]]</p>
+        </div>
+
+        <form th:action="@{/user/update-profile}" method="post" class="profile-form">
+            <label for="newPassword">Nytt lösenord:</label>
+            <input type="password" name="newPassword" id="newPassword" placeholder="Skriv nytt lösenord" required>
+            <div class="button-group">
+                <button type="submit" class="submit-btn">Byt lösenord</button>
+            </div>
+        </form>
+    </section>
+
+
+    <section id="history-section" class="history-section">
+        <h2>Historik</h2>
+        <div class="scroll-container">
+            <table class="status-table">
+                <thead>
+                <tr>
+                    <th>Datum</th>
+                    <th>Poäng</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="visit : ${visits}">
+                    <td th:text="${#temporals.format(visit.visit.checkInTime, 'yyyy-MM-dd')}"></td>
+                    <td th:text="${visit.points}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+
+    <section id="product-list-section" class="user-section">
+        <h2>Belöningar för [[${user.company.name}]]</h2>
+        <div class="scroll-container">
+            <table class="status-table">
+                <thead>
+                <tr>
+                    <th>Bild</th>
+                    <th>Titel</th>
+                    <th>Poäng</th>
+                    <th>Åtgärd</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="reward : ${availableRewards}">
+                    <td><img th:src="${reward.imageUrl}" alt="Produktbild" width="60"/></td>
+                    <td th:text="${reward.name}"></td>
+                    <td th:text="${reward.pointsCost}"></td>
+                    <td>
+                        <form th:action="@{'/user/redeem/' + ${reward.id}}" method="post" style="display:inline;">
+                            <input type="hidden" sec:csrfInput="true"/>
+                            <button type="submit"
+                                    th:disabled="${points < reward.pointsCost}"
+                                    class="submit-btn">
+                                Lös in
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+
+    <section id="purchases-section" class="purchases">
+        <h2>Inlösta belöningar</h2>
+        <table class="status-table">
+            <thead>
+            <tr>
+                <th>Belöning</th>
+                <th>Poäng</th>
+                <th>Datum</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="purchase : ${purchases}">
+                <td th:text="${purchase.product.name}"></td>
+                <td th:text="${purchase.product.pointsCost}"></td>
+                <td th:text="${#temporals.format(purchase.date, 'yyyy-MM-dd HH:mm')}"></td>
+                <td th:text="${purchase.delivered ? 'Levererad' : 'Ej levererad'}"
+                    th:classappend="${purchase.delivered} ? 'status-delivered' : 'status-pending'"></td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="support-section" class="support">
+        <h2>Support</h2>
+        <form th:action="@{/support}" method="post">
+            <textarea name="message" placeholder="Beskriv ditt ärende"></textarea>
+            <button type="submit">Skicka</button>
+        </form>
+    </section>
+
+</main>
+
+<footer>
+    <div class="footer">Co Day 2025</div>
+</footer>
+
+<script th:if="${currentVisit != null}" th:inline="javascript">
+    const checkInTime = /*[[${#temporals.format(currentVisit.checkInTime, "yyyy-MM-dd'T'HH:mm:ss")}]]*/ '2025-01-01T08:00:00';
+    const counter = document.getElementById("time-counter");
+
+    function updateCounter() {
+        const start = new Date(checkInTime);
+        const now = new Date();
+        const diffMs = now - start;
+        const hours = Math.floor(diffMs / (1000 * 60 * 60));
+        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+        const formatted =
+            (hours > 0 ? hours.toString().padStart(2, '0') + ':' : '') +
+            minutes.toString().padStart(2, '0') + ':' +
+            seconds.toString().padStart(2, '0');
+        counter.textContent = formatted;
+    }
+
+    updateCounter();
+    setInterval(updateCounter, 1000);
+</script>
+
+</body>
+</html>

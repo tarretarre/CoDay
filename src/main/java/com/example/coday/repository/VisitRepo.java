@@ -5,6 +5,7 @@ import com.example.coday.model.Visit;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface VisitRepo extends JpaRepository<Visit, Long> {
@@ -17,5 +18,7 @@ public interface VisitRepo extends JpaRepository<Visit, Long> {
 
     Optional<Visit> findFirstByUserAndCheckOutTimeIsNullOrderByCheckInTimeDesc(User user);
 
-    Visit findTopByUserOrderByCheckInTimeDesc(User user);
+    List<Visit> findByUserOrderByCheckInTimeDesc(User user);
+
+    Optional<Visit> findByUserAndCheckOutTimeIsNull(User user);
 }

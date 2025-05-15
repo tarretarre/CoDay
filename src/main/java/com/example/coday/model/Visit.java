@@ -32,7 +32,8 @@ public class Visit {
         return checkOutTime != null;
     }
 
-    // Getters och setters
+    @Column(nullable = false)
+    private int points;
 
     public Long getId() {
         return id;
@@ -64,5 +65,13 @@ public class Visit {
 
     public void setCheckOutTime(LocalDateTime checkOutTime) {
         this.checkOutTime = checkOutTime;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
     }
 }

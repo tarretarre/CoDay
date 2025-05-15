@@ -4,8 +4,9 @@ import com.example.coday.model.User;
 import com.example.coday.model.Visit;
 import com.example.coday.repository.UserRepo;
 import com.example.coday.repository.VisitRepo;
-import jakarta.servlet.http.HttpSession;
+import com.example.coday.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Controller
-@RequestMapping("/visits")
+@RequestMapping("/visit")
 public class VisitController {
 
     private final VisitRepo visitRepo;
@@ -25,10 +26,9 @@ public class VisitController {
         this.userRepo = userRepo;
     }
 
-    @PostMapping("/present")
-    public String markPresent(HttpSession session) {
-        User user = (User) session.getAttribute("loggedInUser");
-        if (user == null) return "redirect:/login";
+    @PostMapping("/checkin")
+    public String checkIn(@AuthenticationPrincipal CustomUserDetails currentUser) {
+        User user = currentUser.getUser();
 
         boolean alreadyCheckedIn = visitRepo.existsByUserAndCheckOutTimeIsNull(user);
         if (!alreadyCheckedIn) {
@@ -38,13 +38,12 @@ public class VisitController {
             visitRepo.save(visit);
         }
 
-        return "redirect:/dashboard/" + user.getId();
+        return "redirect:/user/dashboard";
     }
 
-    @PostMapping("/away")
-    public String markAway(HttpSession session) {
-        User user = (User) session.getAttribute("loggedInUser");
-        if (user == null) return "redirect:/login";
+    @PostMapping("/checkout")
+    public String checkOut(@AuthenticationPrincipal CustomUserDetails currentUser) {
+        User user = currentUser.getUser();
 
         Optional<Visit> visitOpt = visitRepo.findFirstByUserAndCheckOutTimeIsNullOrderByCheckInTimeDesc(user);
         if (visitOpt.isPresent()) {
@@ -62,24 +61,20 @@ public class VisitController {
             visitRepo.save(visit);
         }
 
-        return "redirect:/dashboard/" + user.getId();
+        return "redirect:/user/dashboard";
     }
 
-    @GetMapping("/today/{userId}")
+    @GetMapping("/today")
     @ResponseBody
-    public ResponseEntity<?> getTodayVisit(@PathVariable Long userId) {
-        Optional<User> userOpt = userRepo.findById(userId);
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body("Användare hittades inte.");
-        }
+    public ResponseEntity<?> getTodayVisit(@AuthenticationPrincipal CustomUserDetails currentUser) {
+        User user = currentUser.getUser();
 
         LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         LocalDateTime endOfDay = startOfDay.plusDays(1);
 
-        Optional<Visit> visitOpt = visitRepo.findByUserIdAndCheckInTimeBetween(userId, startOfDay, endOfDay);
+        Optional<Visit> visitOpt = visitRepo.findByUserIdAndCheckInTimeBetween(user.getId(), startOfDay, endOfDay);
 
         return visitOpt.<ResponseEntity<?>>map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.ok("Ingen registrerad incheckning idag."));
     }
 }
-

@@ -32,6 +32,17 @@ public class Purchase {
         this.date = LocalDateTime.now();
     }
 
+    @Column(name = "delivered")
+    private boolean delivered = false;
+
+    public boolean isDelivered() {
+        return delivered;
+    }
+
+    public void setDelivered(boolean delivered) {
+        this.delivered = delivered;
+    }
+
     public Long getId() {
         return id;
     }
@@ -58,5 +69,9 @@ public class Purchase {
 
     public void setDate(LocalDateTime date) {
         this.date = date;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="sv" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Adminpanel – CoDay</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<div class="header" id="myHeader">
+    <nav>
+        <a href="#summary-section" class="home-btn">Summering</a>
+        <a href="#company-section" class="home-btn">Företag</a>
+        <a href="#user-status-section" class="home-btn">Användare</a>
+        <a href="#admin-section" class="info-btn">Företagsansökningar</a>
+        <a href="#role-section" class="login-btn">Rollförfrågan</a>
+        <a href="#product-upload-section" class="login-btn">Skapa belöning</a>
+        <a href="#product-list-section" class="login-btn">Belöning</a>
+        <a href="#purchases-section" class="login-btn">Inlösta belöningar</a>
+        <a href="#reset-section" class="support-btn">Återställ lösenord</a>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="login-btn">Logga ut</button>
+        </form>
+    </nav>
+</div>
+
+<header class="admin-header">
+    <h1>Adminpanel</h1>
+    <p>Inloggad som: <span th:text="${admin.firstName} + ' ' + ${admin.lastName}"></span> (<span th:text="${admin.email}"></span>)</p>
+</header>
+
+<main class="admin-container">
+
+    <section id="summary-section" class="summary-section">
+        <div class="summary-card">Företag: <span th:text="${companyCount}"></span></div>
+        <div class="summary-card">Användare: <span th:text="${allUsers.size()}"></span></div>
+        <div class="summary-card">Närvarande just nu: <span th:text="${activeVisits.size()}"></span></div>
+        <div class="summary-card">Företagsansökningar: <span th:text="${applications.size()}"></span></div>
+        <div class="summary-card">Rollförfrågningar: <span th:text="${roleRequests.size()}"></span></div>
+    </section>
+
+    <div th:if="${success}" class="alert alert-success">[[${success}]]</div>
+    <div th:if="${error}" class="alert alert-error">[[${error}]]</div>
+
+    <section id="company-section" class="company-section">
+        <h2>Företag</h2>
+        <div class="scroll-container">
+            <table class="status-table">
+                <thead>
+                <tr>
+                    <th>Företagsnamn</th>
+                    <th>Org.nr</th>
+                    <th>Registreringslänk</th>
+                    <th>Kopiera länk</th>
+                    <th>Åtgärd</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="company : ${companies}">
+                    <td th:text="${company.name}"></td>
+                    <td th:text="${company.orgNumber}"></td>
+                    <td>
+                        <form th:action="@{/admin/generate-token}" method="post">
+                            <input type="hidden" name="companyId" th:value="${company.id}" />
+                            <button type="submit" class="submit-btn">Skapa länk</button>
+                        </form>
+                    </td>
+                    <td>
+                        <div th:if="${company.registrationToken != null}">
+                            <input type="hidden"
+                                   th:id="'copy-link-' + ${company.id}"
+                                   th:value="${'/register?token=' + company.registrationToken}" />
+                            <button type="button"
+                                    th:attr="onclick=|copyLink('copy-link-' + ${company.id})|"
+                                    class="submit-btn">
+                                Kopiera länk
+                            </button>
+                        </div>
+                    </td>
+                    <td>
+                        <form method="post" th:action="@{/admin/delete-company}" style="display:inline;">
+                            <input type="hidden" name="companyId" th:value="${company.id}" />
+                            <button type="submit" class="clear-btn"
+                                    onclick="return confirm('Är du säker på att du vill ta bort detta företag?')">Ta bort</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+
+    <div th:if="${generatedToken}" class="existing-link-box" style="margin-top: 30px;">
+        <h3>Länk existerar för <span th:text="${generatedCompany}">Företag</span></h3>
+        <p>Du kan kopiera länken nedan och skicka till användaren:</p>
+        <input type="text"
+               th:value="${'/register?token=' + generatedToken}"
+               readonly
+               style="width: 100%; padding: 10px; margin-bottom: 10px;" />
+        <button type="button" onclick="copyGeneratedLink()" class="submit-btn">Kopiera länk</button>
+    </div>
+
+    <section id="user-status-section" class="user-status-section">
+        <h2>Status</h2>
+        <div class="scroll-container">
+            <table class="status-table">
+                <thead>
+                <tr>
+                    <th>Företag</th>
+                    <th>Namn</th>
+                    <th>E-post</th>
+                    <th>Roll</th>
+                    <th>Pågående närvaro</th>
+                    <th>Åtgärd</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${allUsers}"
+                    th:classappend="${activeVisits.containsKey(user.id)} ? 'status-active' : 'status-inactive'"
+                    th:attrappend="data-checkin-time=${checkInTimes[user.id]}, data-user-id=${user.id}">
+
+                    <td th:text="${user.company != null ? user.company.name : 'Okänt'}">Företag</td>
+                    <td th:text="${user.firstName} + ' ' + ${user.lastName}">Namn</td>
+                    <td th:text="${user.email}">E-post</td>
+                    <td th:text="${user.role}">Roll</td>
+                    <td>
+                        <span th:if="${activeVisits.containsKey(user.id)}" class="timer" th:attr="id='timer-' + ${user.id}">00:00:00</span>
+                        <span th:if="${!activeVisits.containsKey(user.id)}">Ej incheckad</span>
+                    </td>
+                    <td>
+                        <button type="button" class="submit-btn" th:attr="onclick='openEditModal(' + ${user.id} + ')'">Redigera</button>
+                    </td>
+                </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </section>
+
+    <section id="admin-section" class="admin-section">
+        <h2>Företagsansökningar</h2>
+
+        <div th:if="${applications.isEmpty()}">Inga företagsansökningar just nu.</div>
+
+        <div class="scroll-container" th:if="${!applications.isEmpty()}">
+            <table class="status-table">
+            <thead>
+            <tr>
+                <th>Företagsnamn</th>
+                <th>Org.nr</th>
+                <th>Kontaktperson</th>
+                <th>Email</th>
+                <th>Telefon</th>
+                <th>Adress</th>
+                <th>Åtgärd</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="app : ${applications}">
+                <td th:text="${app.name}"></td>
+                <td th:text="${app.orgNumber}"></td>
+                <td th:text="${app.contactName}"></td>
+                <td th:text="${app.contactEmail}"></td>
+                <td th:text="${app.contactPhone}"></td>
+                <td th:text="${app.address.streetAddress + ', ' + app.address.postalCode + ' ' + app.address.city}"></td>
+                <td>
+                    <div class="button-group">
+                        <form method="post" th:action="@{/admin/companies/approve}" style="display:inline;">
+                            <input type="hidden" name="applicationId" th:value="${app.id}" />
+                            <button type="submit" class="submit-btn">Godkänn</button>
+                        </form>
+
+                        <form method="post" th:action="@{/admin/companies/delete}" style="display:inline;">
+                            <input type="hidden" name="applicationId" th:value="${app.id}" />
+                            <button type="submit" class="clear-btn"
+                                    onclick="return confirm('Är du säker på att du vill ta bort denna ansökan?')">Ta bort</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="role-section" class="admin-section">
+        <h2>Rollförfrågningar</h2>
+
+        <div th:if="${roleRequests.isEmpty()}">Inga nya rollförfrågningar att hantera just nu.</div>
+
+        <div class="scroll-container" th:if="${!roleRequests.isEmpty()}">
+            <table class="status-table">
+            <thead>
+            <tr>
+                <th>Företag</th>
+                <th>Namn</th>
+                <th>E-post</th>
+                <th>Kommentar</th>
+                <th>Välj roll</th>
+                <th>Åtgärd</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${roleRequests}">
+                <td th:text="${user.company != null ? user.company.name : 'Okänt'}">Företag</td>
+                <td th:text="${user.firstName} + ' ' + ${user.lastName}">Namn</td>
+                <td th:text="${user.email}">E-post</td>
+                <td th:text="${user.adminComment}">Kommentar</td>
+                <td>
+                    <select name="role" th:attr="form='approveForm__' + ${user.id}">
+                        <option value="USER">USER</option>
+                        <option value="ORG_ADMIN">ORG_ADMIN</option>
+                        <option value="ADMIN">ADMIN</option>
+                    </select>
+                </td>
+                <td>
+                    <div class="button-group">
+                        <form method="post" th:action="@{/admin/approve-role}" th:id="'approveForm__' + ${user.id}" style="display:inline;">
+                            <input type="hidden" name="userId" th:value="${user.id}" />
+                            <button type="submit" class="submit-btn">Godkänn</button>
+                        </form>
+
+                        <form method="post" th:action="@{/admin/delete-user}" style="display:inline;">
+                            <input type="hidden" name="userId" th:value="${user.id}" />
+                            <button type="submit" class="clear-btn"
+                                    onclick="return confirm('Är du säker på att du vill ta bort denna användare?')">Ta bort</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="product-upload-section" class="admin-section">
+        <h2>Lägg till ny produkt</h2>
+
+        <form th:action="@{/admin/products/upload}" method="post" enctype="multipart/form-data">
+            <div>
+                <label for="name">Produktnamn:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+
+            <div>
+                <label for="pointsCost">Poängkostnad:</label>
+                <input type="number" id="pointsCost" name="pointsCost" required>
+            </div>
+
+            <div>
+                <label for="image">Produktbild:</label>
+                <input type="file" id="image" name="image" accept="image/*" required>
+            </div>
+
+            <div>
+                <label for="companyId">Företag:</label>
+                <select id="companyId" name="companyId" required>
+                    <option value="" disabled selected>Välj företag</option>
+                    <option th:each="company : ${companies}"
+                            th:value="${company.id}"
+                            th:text="${company.name}"></option>
+                </select>
+            </div>
+
+            <div>
+                <button type="submit" class="submit-btn">Lägg till produkt</button>
+            </div>
+        </form>
+
+        <div th:if="${success}" class="success-message" th:text="${success}"></div>
+        <div th:if="${error}" class="error-message" th:text="${error}"></div>
+    </section>
+
+    <section id="product-list-section" class="admin-section">
+        <h2>Produkter</h2>
+        <div class="scroll-container">
+            <table class="status-table">
+                <thead>
+                <tr>
+                    <th>Bild</th>
+                    <th>Titel</th>
+                    <th>Poäng</th>
+                    <th>Företag</th>
+                    <th>Åtgärder</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="product : ${products}">
+                    <td><img th:src="${product.imageUrl}" alt="Produktbild" width="60"/></td>
+                    <td th:text="${product.name}"></td>
+                    <td th:text="${product.pointsCost}"></td>
+                    <td th:text="${product.company.name}"></td>
+                    <td>
+                        <button type="button" class="submit-btn"
+                                th:attr="onclick=|openEditProductModal('${product.id}', '${product.name}', '${product.pointsCost}', '${product.company.id}')|">
+                            Redigera
+                        </button>
+                        <form th:action="@{'/admin/products/delete/' + ${product.id}}" method="post" style="display:inline;">
+                            <button type="submit" class="clear-btn" onclick="return confirm('Ta bort produkten?')">Ta bort</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="purchases-section" class="admin-section">
+        <h2>Inlösta belöningar</h2>
+        <div class="scroll-container">
+            <table class="status-table">
+                <thead>
+                <tr>
+                    <th>Företag</th>
+                    <th>Användare</th>
+                    <th>Belöning</th>
+                    <th>Poäng</th>
+                    <th>Datum</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="purchase : ${purchases}">
+                    <td th:text="${purchase.product.company.name}">Företag</td>
+                    <td th:text="${purchase.user.firstName + ' ' + purchase.user.lastName}">Användare</td>
+                    <td th:text="${purchase.product.name}">Belöning</td>
+                    <td th:text="${purchase.product.pointsCost}">Poäng</td>
+                    <td th:text="${#temporals.format(purchase.date, 'yyyy-MM-dd HH:mm')}">Datum</td>
+                    <td th:text="${purchase.delivered ? 'Levererad' : 'Ej levererad'}"
+                        th:classappend="${purchase.delivered} ? 'status-delivered' : 'status-pending'">Status</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+
+    <section id="reset-section" class="reset-section">
+        <h2>Tvinga lösenordsbyte</h2>
+        <form method="post" th:action="@{/admin/force-reset-password}" id="resetForm" class="join-form" style="margin-top: 20px;">
+            <input type="email" name="email" placeholder="Användarens e-post" required /><br>
+            <input type="password" name="newPassword" placeholder="Nytt lösenord" required />
+            <div class="button-group">
+                <button type="submit" class="submit-btn" form="resetForm">Byt lösenord</button>
+            </div>
+        </form>
+    </section>
+
+</main>
+
+<div id="editUserModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeEditModal()">&times;</span>
+        <h3>Redigera användare</h3>
+
+        <form method="post" th:action="@{/admin/update-user}" id="editUserForm">
+            <input type="hidden" name="userId" id="editUserId" />
+            <input type="text" name="firstName" placeholder="Förnamn" id="editFirstName" required /><br>
+            <input type="text" name="lastName" placeholder="Efternamn" id="editLastName" required /><br>
+            <input type="email" name="email" placeholder="E-post" id="editEmail" required /><br>
+
+            <select name="role" id="editRole">
+                <option value="USER">USER</option>
+                <option value="ORG_ADMIN">ORG_ADMIN</option>
+                <option value="ADMIN">ADMIN</option>
+            </select><br>
+
+            <select name="companyId" id="editCompany">
+                <option value="">Välj företag</option>
+                <option th:each="company : ${allCompanies}"
+                        th:value="${company.id}"
+                        th:text="${company.name}"></option>
+            </select><br>
+
+            <input type="password" name="newPassword" id="editPassword" placeholder="Nytt lösenord (valfritt)" />
+
+            <div class="button-group">
+                <button type="submit" class="submit-btn">Spara</button>
+            </div>
+        </form>
+
+        <form method="post" th:action="@{/admin/delete-user}" id="deleteUserForm" style="margin-top: 20px;">
+            <input type="hidden" name="userId" id="deleteUserId" />
+            <div class="button-group">
+                <button type="submit" class="clear-btn"
+                        onclick="return confirm('Är du säker på att du vill ta bort användaren?')">Ta bort användare</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="adminSuccessModal" class="modal" th:if="${success}">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeAdminModal()">&times;</span>
+        <p th:text="${success}">Ändringen sparades.</p>
+    </div>
+</div>
+
+<div id="tokenModal" class="modal" th:if="${generatedToken}" style="display:flex;">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeTokenModal()">&times;</span>
+        <h3>Registreringslänk för <span th:text="${generatedCompany}">Företag</span></h3>
+        <input type="text" id="generatedRegistrationLink" th:value="${'/register?token=' + generatedToken}" readonly style="width: 100%; padding: 10px; margin-top: 10px;" />
+        <button type="button" onclick="copyGeneratedLink()" class="submit-btn" style="margin-top: 10px;">Kopiera länk</button>
+    </div>
+</div>
+
+<div id="editProductModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeEditProductModal()">&times;</span>
+        <h3>Redigera produkt</h3>
+
+        <form th:action="@{/admin/products/edit}" method="post" enctype="multipart/form-data">
+            <input type="hidden" id="editProductId" name="productId">
+
+            <div>
+                <label for="editName">Produktnamn:</label>
+                <input type="text" id="editName" name="name" required>
+            </div>
+
+            <div>
+                <label for="editPointsCost">Poängkostnad:</label>
+                <input type="number" id="editPointsCost" name="pointsCost" required>
+            </div>
+
+            <div>
+                <label for="editImage">Byt bild (valfritt):</label>
+                <input type="file" id="editImage" name="image" accept="image/*">
+            </div>
+
+            <div>
+                <label for="editCompanyId">Företag:</label>
+                <select id="editCompanyId" name="companyId" required>
+                    <option value="" disabled selected>Välj företag</option>
+                    <option th:each="company : ${companies}"
+                            th:value="${company.id}"
+                            th:text="${company.name}"></option>
+                </select>
+            </div>
+
+            <div>
+                <button type="submit" class="submit-btn">Spara ändringar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<footer>
+    <div class="footer">Co Day 2025</div>
+</footer>
+
+<script>
+    function updateTimers() {
+        const rows = document.querySelectorAll('tr[data-checkin-time]');
+
+        rows.forEach(row => {
+            const userId = row.getAttribute('data-user-id');
+            const checkInIso = row.getAttribute('data-checkin-time');
+
+            if (!checkInIso) return;
+
+            const checkInTime = new Date(checkInIso);
+            const now = new Date();
+            const elapsed = new Date(now - checkInTime);
+
+            const hours = String(elapsed.getUTCHours()).padStart(2, '0');
+            const minutes = String(elapsed.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(elapsed.getUTCSeconds()).padStart(2, '0');
+
+            const timerElement = document.getElementById('timer-' + userId);
+            if (timerElement) {
+                timerElement.textContent = `${hours}:${minutes}:${seconds}`;
+            }
+        });
+    }
+
+    setInterval(updateTimers, 1000);
+
+    function openEditModal(userId) {
+        const row = document.querySelector(`tr[data-user-id="${userId}"]`);
+        if (!row) return;
+
+        document.getElementById('editUserId').value = userId;
+        document.getElementById('editFirstName').value = row.querySelector('td:nth-child(2)').innerText.split(' ')[0];
+        document.getElementById('editLastName').value = row.querySelector('td:nth-child(2)').innerText.split(' ')[1];
+        document.getElementById('editEmail').value = row.querySelector('td:nth-child(3)').innerText;
+        document.getElementById('editRole').value = row.querySelector('td:nth-child(4)').innerText;
+        document.getElementById('deleteUserId').value = userId;
+
+        document.getElementById('editUserModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editUserModal').style.display = 'none';
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+        const adminModal = document.getElementById("adminSuccessModal");
+
+        if (adminModal) {
+        adminModal.style.display = "flex";
+
+        setTimeout(() => {
+        closeAdminModal();
+    }, 4000);
+    }
+    });
+
+        function closeAdminModal() {
+        const modal = document.getElementById("adminSuccessModal");
+        if (modal) modal.style.display = "none";
+    }
+
+    function copyGeneratedLink() {
+        const input = document.getElementById("generatedRegistrationLink");
+
+        if (!input) {
+            alert("Länken kunde inte hittas.");
+            return;
+        }
+
+        navigator.clipboard.writeText(input.value)
+            .then(() => {
+                alert("Länk kopierad: " + input.value);
+            })
+            .catch(err => {
+                console.error("Kunde inte kopiera länken:", err);
+                alert("Ett fel uppstod vid kopiering.");
+            });
+    }
+
+
+    function copyLink(inputId) {
+        const input = document.getElementById(inputId);
+        if (input) {
+            navigator.clipboard.writeText(input.value)
+                .then(() => alert("Länk kopierad: " + input.value))
+                .catch(err => alert("Misslyckades att kopiera länk."));
+        }
+    }
+
+    function openEditProductModal(id, name, pointsCost, companyId) {
+        document.getElementById("editProductId").value = id;
+        document.getElementById("editName").value = name;
+        document.getElementById("editPointsCost").value = pointsCost;
+        document.getElementById("editCompanyId").value = companyId;
+        document.getElementById("editProductModal").style.display = "flex";
+    }
+
+    function closeEditProductModal() {
+        document.getElementById("editProductModal").style.display = "none";
+    }
+
+</script>
+</body>
+</html>

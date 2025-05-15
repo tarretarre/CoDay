@@ -2,92 +2,68 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="sv">
 <head>
     <meta charset="UTF-8">
-    <title>Ny användare</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .error {
-            color: red;
-            font-size: 0.9em;
-            margin-bottom: 8px;
-            display: block;
-        }
-        .form-field {
-            margin-bottom: 16px;
-        }
-    </style>
+    <title>Registrera ny användare</title>
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-
-<div class="container py-5">
-    <h1 class="mb-4">Skapa ny användare</h1>
-
-    <form th:action="@{/create-user}" th:object="${user}" method="post">
-        <input type="hidden" th:field="*{company.id}" />
-
-        <div class="form-field">
-            <label>Förnamn</label>
-            <input type="text" th:field="*{firstName}" class="form-control" placeholder="Förnamn" required />
-            <span class="error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
+<main>
+    <section id="register-section" class="join-section">
+        <div class="join-container">
+            <h2>Registrera användare</h2>
+            <p>Fyll i formuläret nedan för att registrera dig till bolaget <span th:text="${companyName}">ditt företag</span>.</p>
         </div>
 
-        <div class="form-field">
-            <label>Efternamn</label>
-            <input type="text" th:field="*{lastName}" class="form-control" placeholder="Efternamn" required />
-            <span class="error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
+        <div class="join-container-form">
+            <form th:action="@{/create-user}" th:object="${user}" method="post" class="join-form" id="registerForm">
+            <input type="hidden" th:field="*{company.id}" />
+
+                <div class="form-group">
+                    <input type="text" th:field="*{firstName}" placeholder="Förnamn" required>
+                    <div class="field-error" th:errors="*{firstName}"></div><br>
+
+                    <input type="text" th:field="*{lastName}" placeholder="Efternamn" required>
+                    <div class="field-error" th:errors="*{lastName}"></div><br>
+
+                    <input type="email" th:field="*{email}" placeholder="E-postadress" required>
+                    <div class="field-error" th:errors="*{email}"></div><br>
+
+                    <input type="text" th:field="*{ssn}" placeholder="Personnummer (10 eller 12 siffror)" required>
+                    <div class="field-error" th:errors="*{ssn}"></div><br>
+
+                    <input type="password" th:field="*{password}" placeholder="Lösenord" required>
+                    <div class="field-error" th:errors="*{password}"></div><br>
+
+                    Kommentar<br>
+                    <textarea th:field="*{adminComment}" placeholder="Ange roll eller kommentar (ex. admin, användare)" required rows="2"></textarea>
+                    <div class="field-error" th:errors="*{adminComment}"></div>
+                </div>
+
+                <h3>Adress</h3>
+                <div class="form-group">
+                    <input type="text" th:field="*{address.streetAddress}" placeholder="Gatuadress" required><br>
+                    <input type="text" th:field="*{address.postalCode}" placeholder="Postnummer" required><br>
+                    <input type="text" th:field="*{address.city}" placeholder="Ort" required><br>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="submit-btn">Registrera</button>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="clear-btn" onclick="resetRegisterForm()">Rensa</button>
+                </div>
+            </form>
+
+            <div class="button-group">
+                <a href="/" class="join-btn">&#8592; Till startsidan</a>
+            </div>
         </div>
-
-        <div class="form-field">
-            <label>E-postadress</label>
-            <input type="email" th:field="*{email}" class="form-control" placeholder="E-postadress" required />
-            <span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
-        </div>
-
-        <div class="form-field">
-            <label>Personnummer (10 eller 12 siffror)</label>
-            <input type="text" th:field="*{ssn}" class="form-control" placeholder="ÅÅÅÅMMDDXXXX" required />
-            <span class="error" th:if="${#fields.hasErrors('ssn')}" th:errors="*{ssn}"></span>
-        </div>
-
-        <div class="form-field">
-            <label>Lösenord</label>
-            <input type="password" th:field="*{password}" class="form-control" placeholder="Lösenord" required />
-            <span class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
-        </div>
-
-        <div class="form-field">
-            <label>Kommentar (ex. vad har du för roll på företag? Admin eller användare?)</label>
-            <textarea th:field="*{adminComment}" class="form-control" rows="3" placeholder="Exempel: Jag är ansvarig för vårt kontorsprogram..."></textarea>
-            <span class="error" th:if="${#fields.hasErrors('adminComment')}" th:errors="*{adminComment}"></span>
-        </div>
-
-        <h4 class="mt-4">Adress</h4>
-
-        <div class="form-field">
-            <label>Gatuadress</label>
-            <input type="text" th:field="*{address.streetAddress}" class="form-control" placeholder="Exempelgatan 1" required />
-        </div>
-
-        <div class="form-field">
-            <label>Postnummer</label>
-            <input type="text" th:field="*{address.postalCode}" class="form-control" placeholder="123 45" required />
-        </div>
-
-        <div class="form-field">
-            <label>Ort</label>
-            <input type="text" th:field="*{address.city}" class="form-control" placeholder="Stockholm" required />
-        </div>
-
-        <div class="d-flex gap-3 mt-4">
-            <button type="submit" class="btn btn-primary">Registrera</button>
-            <button type="reset" class="btn btn-secondary">Rensa</button>
-        </div>
-    </form>
-
-    <div class="mt-4">
-        <a href="/" style="text-decoration:none;">← Tillbaka till startsidan</a>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    </section>
+</main>
+<script>
+    function resetRegisterForm() {
+        const form = document.getElementById('registerForm');
+        form.reset();
+    }
+</script>
 </body>
 </html>
