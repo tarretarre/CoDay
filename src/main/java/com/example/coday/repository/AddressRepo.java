@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface AddressRepo extends JpaRepository<Address, Long> {
     Optional<Address> findByStreetAddressIgnoreCaseAndPostalCodeAndCityIgnoreCase(String streetAddress, String postalCode, String city);
+
 }

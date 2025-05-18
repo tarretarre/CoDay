@@ -3,6 +3,7 @@ package com.example.coday.controller;
 import com.example.coday.model.*;
 import com.example.coday.repository.*;
 import com.example.coday.security.CustomUserDetails;
+import com.example.coday.util.PostalCodeUtil;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -106,7 +107,7 @@ public class AdminDashboardController {
         Optional<CompanyApplication> optApp = applicationRepo.findById(applicationId);
         if (optApp.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Ansökan kunde inte hittas.");
-            return "redirect:/admin/dashboard";
+            return "redirect:/admin/dashboard#admin-section";
         }
 
         CompanyApplication app = optApp.get();
@@ -114,26 +115,29 @@ public class AdminDashboardController {
 
         if (companyRepo.existsByOrgNumber(cleanedOrg)) {
             redirectAttributes.addFlashAttribute("error", "Företaget finns redan registrerat.");
-            return "redirect:/admin/dashboard";
+            return "redirect:/admin/dashboard#admin-section";
         }
 
-        EmbeddedAddress ea = app.getAddress();
-        if (ea == null) {
+        Address addressFromApp = app.getAddress();
+        if (addressFromApp == null) {
             redirectAttributes.addFlashAttribute("error", "Adress saknas i ansökan.");
-            return "redirect:/admin/dashboard";
+            return "redirect:/admin/dashboard#admin-section";
         }
 
+        String street = addressFromApp.getStreetAddress().trim();
+        String postal = PostalCodeUtil.formatPostalCode(addressFromApp.getPostalCode().trim());
+        String city = addressFromApp.getCity().trim();
+
+        // Sök efter existerande adress
         Address address = addressRepo
-                .findByStreetAddressIgnoreCaseAndPostalCodeAndCityIgnoreCase(
-                        ea.getStreetAddress().trim(),
-                        ea.getPostalCode().trim(),
-                        ea.getCity().trim()
-                )
-                .orElseGet(() -> addressRepo.save(new Address(
-                        ea.getStreetAddress().trim(),
-                        ea.getPostalCode().trim(),
-                        ea.getCity().trim()
-                )));
+                .findByStreetAddressIgnoreCaseAndPostalCodeAndCityIgnoreCase(street, postal, city)
+                .orElseGet(() -> {
+                    Address newAddress = new Address();
+                    newAddress.setStreetAddress(street);
+                    newAddress.setPostalCode(postal);
+                    newAddress.setCity(city);
+                    return addressRepo.save(newAddress);
+                });
 
         Company company = new Company();
         company.setName(app.getName());
@@ -147,8 +151,9 @@ public class AdminDashboardController {
         applicationRepo.delete(app);
 
         redirectAttributes.addFlashAttribute("success", "Företaget har godkänts.");
-        return "redirect:/admin/dashboard";
+        return "redirect:/admin/dashboard#admin-section";
     }
+
 
     @PostMapping("/companies/delete")
     public String deleteCompanyApplication(@RequestParam Long applicationId, RedirectAttributes redirectAttributes) {
@@ -161,7 +166,7 @@ public class AdminDashboardController {
             redirectAttributes.addFlashAttribute("error", "Företagsansökan kunde inte hittas.");
         }
 
-        return "redirect:/admin/dashboard";
+        return "redirect:/admin/dashboard#admin-section";
     }
 
     @PostMapping("/delete-company")
@@ -172,7 +177,7 @@ public class AdminDashboardController {
         } else {
             redirectAttributes.addFlashAttribute("error", "Företaget kunde inte hittas.");
         }
-        return "redirect:/admin/dashboard";
+        return "redirect:/admin/dashboard#company-section";
     }
 
     @PostMapping("/update-user")
@@ -188,7 +193,7 @@ public class AdminDashboardController {
         Optional<User> optUser = userRepo.findById(userId);
         if (optUser.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Användare hittades inte.");
-            return "redirect:/admin/dashboard";
+            return "redirect:/admin/dashboard#user-status-section";
         }
 
         User user = optUser.get();
@@ -201,7 +206,7 @@ public class AdminDashboardController {
             user.setRole(User.Role.valueOf(role));
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", "Ogiltig roll.");
-            return "redirect:/admin/dashboard";
+            return "redirect:/admin/dashboard#user-status-section";
         }
 
         if (companyId != null) {
@@ -214,7 +219,7 @@ public class AdminDashboardController {
 
         userRepo.save(user);
         redirectAttributes.addFlashAttribute("success", "Användaruppgifter har uppdaterats.");
-        return "redirect:/admin/dashboard";
+        return "redirect:/admin/dashboard#user-status-section";
     }
 
     @PostMapping("/approve-role")
@@ -234,7 +239,7 @@ public class AdminDashboardController {
         });
 
         redirectAttributes.addFlashAttribute("success", "Rollen har uppdaterats!");
-        return "redirect:/admin/dashboard";
+        return "redirect:/admin/dashboard#user-status-section";
     }
 
     @PostMapping("/delete-user")
@@ -248,7 +253,7 @@ public class AdminDashboardController {
             redirectAttributes.addFlashAttribute("error", "Användaren kunde inte hittas.");
         }
 
-        return "redirect:/admin/dashboard";
+        return "redirect:/admin/dashboard#user-status-section";
     }
 
     @PostMapping("/force-reset-password")
@@ -265,7 +270,7 @@ public class AdminDashboardController {
             redirectAttributes.addFlashAttribute("error", "Ingen användare hittades med e-postadressen.");
         }
 
-        return "redirect:/admin/dashboard";
+        return "redirect:/admin/dashboard#reset-section";
     }
 
 

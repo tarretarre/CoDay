@@ -18,17 +18,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @Controller
-public class HomeController {
+public class UserRegistrationController {
 
     private final UserRepo userRepo;
     private final CompanyRepo companyRepo;
     private final AddressRepo addressRepo;
     private final PasswordEncoder passwordEncoder;
 
-    public HomeController(UserRepo userRepo,
-                          CompanyRepo companyRepo,
-                          AddressRepo addressRepo,
-                          PasswordEncoder passwordEncoder) {
+    public UserRegistrationController(UserRepo userRepo,
+                                      CompanyRepo companyRepo,
+                                      AddressRepo addressRepo,
+                                      PasswordEncoder passwordEncoder) {
         this.userRepo = userRepo;
         this.companyRepo = companyRepo;
         this.addressRepo = addressRepo;

@@ -163,12 +163,17 @@
                 <td th:text="${app.contactName}"></td>
                 <td th:text="${app.contactEmail}"></td>
                 <td th:text="${app.contactPhone}"></td>
-                <td th:text="${app.address.streetAddress + ', ' + app.address.postalCode + ' ' + app.address.city}"></td>
+                <td th:if="${app.address != null}"
+                    th:text="${app.address.streetAddress + ', ' + app.address.postalCode + ' ' + app.address.city}">
+                </td>
+                <td th:if="${app.address == null}">
+                    <i>Saknar adress</i>
+                </td>
                 <td>
                     <div class="button-group">
                         <form method="post" th:action="@{/admin/companies/approve}" style="display:inline;">
                             <input type="hidden" name="applicationId" th:value="${app.id}" />
-                            <button type="submit" class="submit-btn">Godkänn</button>
+                            <button type="submit" class="submit-btn" th:disabled="${app.address == null}">Godkänn</button>
                         </form>
 
                         <form method="post" th:action="@{/admin/companies/delete}" style="display:inline;">

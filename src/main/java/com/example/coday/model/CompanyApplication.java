@@ -30,8 +30,9 @@ public class CompanyApplication {
     @Pattern(regexp = "^[0-9+\\- ]{6,20}$", message = "Ogiltigt telefonnummer")
     private String contactPhone;
 
-    @Embedded
-    private EmbeddedAddress address;
+    @ManyToOne
+    @JoinColumn(name = "address_id", nullable = false)
+    private Address address;
 
     private boolean approved = false;
 
@@ -83,11 +84,19 @@ public class CompanyApplication {
         this.contactPhone = contactPhone;
     }
 
-    public EmbeddedAddress getAddress() {
+    public Address getAddress() {
         return address;
     }
 
-    public void setAddress(EmbeddedAddress address) {
+    public void setAddress(Address address) {
         this.address = address;
+    }
+
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
     }
 }

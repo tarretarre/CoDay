@@ -177,7 +177,7 @@ public class User {
         return ssn.length() == 12 ? ssn.substring(2) : ssn;
     }
 
-    public boolean isApproved() {
+    public boolean  isApproved() {
         return approved;
     }
 
