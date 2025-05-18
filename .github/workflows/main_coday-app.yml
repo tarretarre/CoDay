@@ -38,6 +38,9 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
+    env:
+      DB_PASSWORD_AZURE: ${{ secrets.DB_PASSWORD_AZURE }}
+
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
