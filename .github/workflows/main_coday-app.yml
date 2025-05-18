@@ -40,6 +40,7 @@ jobs:
 
     env:
       DB_PASSWORD_AZURE: ${{ secrets.DB_PASSWORD_AZURE }}
+      SPRING_PROFILES_ACTIVE: prod
 
     steps:
       - name: Download artifact
