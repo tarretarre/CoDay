@@ -72,7 +72,7 @@ public class CompanyWebController {
                 newAddress.setStreetAddress(street);
                 newAddress.setPostalCode(postal);
                 newAddress.setCity(city);
-                addressToUse = addressRepo.save(newAddress); // Viktigt att spara!
+                addressToUse = addressRepo.save(newAddress);
             }
 
             application.setAddress(addressToUse);

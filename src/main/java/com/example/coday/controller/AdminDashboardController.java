@@ -128,7 +128,6 @@ public class AdminDashboardController {
         String postal = PostalCodeUtil.formatPostalCode(addressFromApp.getPostalCode().trim());
         String city = addressFromApp.getCity().trim();
 
-        // Sök efter existerande adress
         Address address = addressRepo
                 .findByStreetAddressIgnoreCaseAndPostalCodeAndCityIgnoreCase(street, postal, city)
                 .orElseGet(() -> {
@@ -239,7 +238,7 @@ public class AdminDashboardController {
         });
 
         redirectAttributes.addFlashAttribute("success", "Rollen har uppdaterats!");
-        return "redirect:/admin/dashboard#user-status-section";
+        return "redirect:/admin/dashboard#role-section";
     }
 
     @PostMapping("/delete-user")

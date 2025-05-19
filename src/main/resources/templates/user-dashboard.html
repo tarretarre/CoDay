@@ -10,14 +10,14 @@
 
 <div class="header" id="myHeader">
     <nav>
-        <a href="#status-section" class="home-btn">Status</a>
-        <a href="#profile-section" class="login-btn">Min sida</a>
-        <a href="#history-section" class="home-btn">Historik</a>
-        <a href="#product-list-section" class="login-btn">Belöningar</a>
-        <a href="#purchases-section" class="login-btn">Inlösta belöningar</a>
-        <a href="#support-section" class="login-btn">Support</a>
+        <a href="#status-section" class="header-btn">Status</a>
+        <a href="#profile-section" class="header-btn">Min sida</a>
+        <a href="#history-section" class="header-btn">Historik</a>
+        <a href="#product-list-section" class="header-btn">Belöningar</a>
+        <a href="#purchases-section" class="header-btn">Inlösta belöningar</a>
+        <a href="#support-section" class="header-btn">Support</a>
         <form th:action="@{/logout}" method="post">
-            <button type="submit" class="login-btn">Logga ut</button>
+            <button type="submit" class="logout-btn">Logga ut</button>
         </form>
     </nav>
 </div>
@@ -32,14 +32,14 @@
     <div th:if="${success}" class="success-message" th:text="${success}"></div>
     <div th:if="${error}" class="error-message" th:text="${error}"></div>
 
-    <section id="status-section" class="summary-section">
+    <section id="status-section" class="status-section">
         <h2>Din status</h2>
         <div class="status-info">
-            <p>🏆 Totala poäng: <strong>[[${points}]]</strong></p>
+            <p>Totala poäng: <strong>[[${points}]]</strong></p>
 
             <p th:if="${currentVisit != null}">
                 Status: <strong>Incheckad</strong> sedan [[${#temporals.format(currentVisit.checkInTime, 'yyyy-MM-dd HH:mm')}]]<br>
-                ⏱ Tid på plats: <strong id="time-counter">räknar...</strong>
+                Tid på plats: <strong id="time-counter" th:attr="data-checkin=${#temporals.format(currentVisit.checkInTime, 'yyyy-MM-dd''T''HH:mm:ss')}">räknar...</strong>
             </p>
             <p th:if="${currentVisit == null}">
                 Status: <strong>Inte incheckad</strong>
@@ -48,10 +48,12 @@
 
         <div class="button-group">
             <form th:if="${currentVisit != null}" method="post" th:action="@{/visit/checkout}">
+                <input type="hidden" sec:csrfInput="true"/>
                 <button type="submit" class="check-btn check-out-btn">Checka ut</button>
             </form>
 
             <form th:unless="${currentVisit != null}" method="post" th:action="@{/visit/checkin}">
+                <input type="hidden" sec:csrfInput="true"/>
                 <button type="submit" class="check-btn check-in-btn">Checka in</button>
             </form>
         </div>
@@ -66,6 +68,7 @@
         </div>
 
         <form th:action="@{/user/update-profile}" method="post" class="profile-form">
+            <input type="hidden" sec:csrfInput="true"/>
             <label for="newPassword">Nytt lösenord:</label>
             <input type="password" name="newPassword" id="newPassword" placeholder="Skriv nytt lösenord" required>
             <div class="button-group">
@@ -96,7 +99,7 @@
     </section>
 
 
-    <section id="product-list-section" class="user-section">
+    <section id="product-list-section" class="product-list-section">
         <h2>Belöningar för [[${user.company.name}]]</h2>
         <div class="scroll-container">
             <table class="status-table">
@@ -116,9 +119,7 @@
                     <td>
                         <form th:action="@{'/user/redeem/' + ${reward.id}}" method="post" style="display:inline;">
                             <input type="hidden" sec:csrfInput="true"/>
-                            <button type="submit"
-                                    th:disabled="${points < reward.pointsCost}"
-                                    class="submit-btn">
+                            <button type="submit" class="submit-btn">
                                 Lös in
                             </button>
                         </form>
@@ -130,7 +131,7 @@
     </section>
 
 
-    <section id="purchases-section" class="purchases">
+    <section id="purchases-section" class="purchases-section">
         <h2>Inlösta belöningar</h2>
         <table class="status-table">
             <thead>
@@ -156,8 +157,9 @@
     <section id="support-section" class="support">
         <h2>Support</h2>
         <form th:action="@{/support}" method="post">
-            <textarea name="message" placeholder="Beskriv ditt ärende"></textarea>
-            <button type="submit">Skicka</button>
+            <input type="hidden" sec:csrfInput="true"/>
+            <textarea name="message" placeholder="Beskriv ditt ärende"></textarea><br>
+            <button type="submit" class="submit-btn">Skicka</button>
         </form>
     </section>
 
@@ -167,27 +169,34 @@
     <div class="footer">Co Day 2025</div>
 </footer>
 
-<script th:if="${currentVisit != null}" th:inline="javascript">
-    const checkInTime = /*[[${#temporals.format(currentVisit.checkInTime, "yyyy-MM-dd'T'HH:mm:ss")}]]*/ '2025-01-01T08:00:00';
+<div th:replace="fragments/modal :: body"></div>
+
+<script src="/js/modals.js"></script>
+<script>
+    const checkInTimeStr = document.getElementById("time-counter") ? document.getElementById("time-counter").dataset.checkin : null;
     const counter = document.getElementById("time-counter");
 
-    function updateCounter() {
-        const start = new Date(checkInTime);
-        const now = new Date();
-        const diffMs = now - start;
-        const hours = Math.floor(diffMs / (1000 * 60 * 60));
-        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-        const formatted =
-            (hours > 0 ? hours.toString().padStart(2, '0') + ':' : '') +
-            minutes.toString().padStart(2, '0') + ':' +
-            seconds.toString().padStart(2, '0');
-        counter.textContent = formatted;
-    }
+    if (checkInTimeStr && counter) {
+        const checkInTime = new Date(checkInTimeStr);
 
-    updateCounter();
-    setInterval(updateCounter, 1000);
+        function updateCounter() {
+            const now = new Date();
+            const diffMs = now - checkInTime;
+            const hours = Math.floor(diffMs / (1000 * 60 * 60));
+            const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+            const formatted =
+                (hours > 0 ? hours.toString().padStart(2, '0') + ':' : '') +
+                minutes.toString().padStart(2, '0') + ':' +
+                seconds.toString().padStart(2, '0');
+            counter.textContent = formatted;
+        }
+
+        updateCounter();
+        setInterval(updateCounter, 1000);
+    }
 </script>
+
 
 </body>
 </html>

@@ -9,17 +9,17 @@
 
 <div class="header" id="myHeader">
     <nav>
-        <a href="#summary-section" class="home-btn">Summering</a>
-        <a href="#company-section" class="home-btn">Företag</a>
-        <a href="#user-status-section" class="home-btn">Användare</a>
-        <a href="#admin-section" class="info-btn">Företagsansökningar</a>
-        <a href="#role-section" class="login-btn">Rollförfrågan</a>
-        <a href="#product-upload-section" class="login-btn">Skapa belöning</a>
-        <a href="#product-list-section" class="login-btn">Belöning</a>
-        <a href="#purchases-section" class="login-btn">Inlösta belöningar</a>
-        <a href="#reset-section" class="support-btn">Återställ lösenord</a>
+        <a href="#summary-section" class="header-btn">Summering</a>
+        <a href="#company-section" class="header-btn">Företag</a>
+        <a href="#user-status-section" class="header-btn">Användare</a>
+        <a href="#admin-section" class="header-btn">Företagsansökningar</a>
+        <a href="#role-section" class="header-btn">Rollförfrågan</a>
+        <a href="#product-upload-section" class="header-btn">Skapa belöning</a>
+        <a href="#product-list-section" class="header-btn">Belöningar</a>
+        <a href="#purchases-section" class="header-btn">Inlösta belöningar</a>
+        <a href="#reset-section" class="header-btn">Återställ lösenord</a>
         <form th:action="@{/logout}" method="post">
-            <button type="submit" class="login-btn">Logga ut</button>
+            <button type="submit" class="logout-btn">Logga ut</button>
         </form>
     </nav>
 </div>
@@ -62,7 +62,7 @@
                     <td>
                         <form th:action="@{/admin/generate-token}" method="post">
                             <input type="hidden" name="companyId" th:value="${company.id}" />
-                            <button type="submit" class="submit-btn">Skapa länk</button>
+                            <button type="submit" class="body-btn">Skapa länk</button>
                         </form>
                     </td>
                     <td>
@@ -72,7 +72,7 @@
                                    th:value="${'/register?token=' + company.registrationToken}" />
                             <button type="button"
                                     th:attr="onclick=|copyLink('copy-link-' + ${company.id})|"
-                                    class="submit-btn">
+                                    class="body-btn">
                                 Kopiera länk
                             </button>
                         </div>
@@ -98,7 +98,7 @@
                th:value="${'/register?token=' + generatedToken}"
                readonly
                style="width: 100%; padding: 10px; margin-bottom: 10px;" />
-        <button type="button" onclick="copyGeneratedLink()" class="submit-btn">Kopiera länk</button>
+        <button type="button" onclick="copyGeneratedLink()" class="header-btn">Kopiera länk</button>
     </div>
 
     <section id="user-status-section" class="user-status-section">
@@ -129,7 +129,7 @@
                         <span th:if="${!activeVisits.containsKey(user.id)}">Ej incheckad</span>
                     </td>
                     <td>
-                        <button type="button" class="submit-btn" th:attr="onclick='openEditModal(' + ${user.id} + ')'">Redigera</button>
+                        <button type="button" class="header-btn" th:attr="onclick='openEditModal(' + ${user.id} + ')'">Redigera</button>
                     </td>
                 </tr>
                 </tbody>
@@ -173,7 +173,7 @@
                     <div class="button-group">
                         <form method="post" th:action="@{/admin/companies/approve}" style="display:inline;">
                             <input type="hidden" name="applicationId" th:value="${app.id}" />
-                            <button type="submit" class="submit-btn" th:disabled="${app.address == null}">Godkänn</button>
+                            <button type="submit" class="header-btn" th:disabled="${app.address == null}">Godkänn</button>
                         </form>
 
                         <form method="post" th:action="@{/admin/companies/delete}" style="display:inline;">
@@ -223,7 +223,7 @@
                     <div class="button-group">
                         <form method="post" th:action="@{/admin/approve-role}" th:id="'approveForm__' + ${user.id}" style="display:inline;">
                             <input type="hidden" name="userId" th:value="${user.id}" />
-                            <button type="submit" class="submit-btn">Godkänn</button>
+                            <button type="submit" class="header-btn">Godkänn</button>
                         </form>
 
                         <form method="post" th:action="@{/admin/delete-user}" style="display:inline;">
@@ -269,7 +269,7 @@
             </div>
 
             <div>
-                <button type="submit" class="submit-btn">Lägg till produkt</button>
+                <button type="submit" class="header-btn">Lägg till produkt</button>
             </div>
         </form>
 
@@ -297,7 +297,7 @@
                     <td th:text="${product.pointsCost}"></td>
                     <td th:text="${product.company.name}"></td>
                     <td>
-                        <button type="button" class="submit-btn"
+                        <button type="button" class="header-btn"
                                 th:attr="onclick=|openEditProductModal('${product.id}', '${product.name}', '${product.pointsCost}', '${product.company.id}')|">
                             Redigera
                         </button>
@@ -347,7 +347,7 @@
             <input type="email" name="email" placeholder="Användarens e-post" required /><br>
             <input type="password" name="newPassword" placeholder="Nytt lösenord" required />
             <div class="button-group">
-                <button type="submit" class="submit-btn" form="resetForm">Byt lösenord</button>
+                <button type="submit" class="header-btn" form="resetForm">Byt lösenord</button>
             </div>
         </form>
     </section>
@@ -381,7 +381,7 @@
             <input type="password" name="newPassword" id="editPassword" placeholder="Nytt lösenord (valfritt)" />
 
             <div class="button-group">
-                <button type="submit" class="submit-btn">Spara</button>
+                <button type="submit" class="header-btn">Spara</button>
             </div>
         </form>
 
@@ -407,7 +407,7 @@
         <span class="close-btn" onclick="closeTokenModal()">&times;</span>
         <h3>Registreringslänk för <span th:text="${generatedCompany}">Företag</span></h3>
         <input type="text" id="generatedRegistrationLink" th:value="${'/register?token=' + generatedToken}" readonly style="width: 100%; padding: 10px; margin-top: 10px;" />
-        <button type="button" onclick="copyGeneratedLink()" class="submit-btn" style="margin-top: 10px;">Kopiera länk</button>
+        <button type="button" onclick="copyGeneratedLink()" class="header-btn" style="margin-top: 10px;">Kopiera länk</button>
     </div>
 </div>
 
@@ -445,7 +445,7 @@
             </div>
 
             <div>
-                <button type="submit" class="submit-btn">Spara ändringar</button>
+                <button type="submit" class="save-btn">Spara ändringar</button>
             </div>
         </form>
     </div>
@@ -455,44 +455,35 @@
     <div class="footer">Co Day 2025</div>
 </footer>
 
+<script src="/js/modals.js"></script>
 <script>
     function updateTimers() {
         const rows = document.querySelectorAll('tr[data-checkin-time]');
-
         rows.forEach(row => {
             const userId = row.getAttribute('data-user-id');
             const checkInIso = row.getAttribute('data-checkin-time');
-
             if (!checkInIso) return;
-
             const checkInTime = new Date(checkInIso);
             const now = new Date();
             const elapsed = new Date(now - checkInTime);
-
             const hours = String(elapsed.getUTCHours()).padStart(2, '0');
             const minutes = String(elapsed.getUTCMinutes()).padStart(2, '0');
             const seconds = String(elapsed.getUTCSeconds()).padStart(2, '0');
-
             const timerElement = document.getElementById('timer-' + userId);
-            if (timerElement) {
-                timerElement.textContent = `${hours}:${minutes}:${seconds}`;
-            }
+            if (timerElement) timerElement.textContent = `${hours}:${minutes}:${seconds}`;
         });
     }
-
     setInterval(updateTimers, 1000);
 
     function openEditModal(userId) {
         const row = document.querySelector(`tr[data-user-id="${userId}"]`);
         if (!row) return;
-
         document.getElementById('editUserId').value = userId;
         document.getElementById('editFirstName').value = row.querySelector('td:nth-child(2)').innerText.split(' ')[0];
         document.getElementById('editLastName').value = row.querySelector('td:nth-child(2)').innerText.split(' ')[1];
         document.getElementById('editEmail').value = row.querySelector('td:nth-child(3)').innerText;
         document.getElementById('editRole').value = row.querySelector('td:nth-child(4)').innerText;
         document.getElementById('deleteUserId').value = userId;
-
         document.getElementById('editUserModal').style.display = 'flex';
     }
 
@@ -500,48 +491,36 @@
         document.getElementById('editUserModal').style.display = 'none';
     }
 
-    window.addEventListener("DOMContentLoaded", () => {
-        const adminModal = document.getElementById("adminSuccessModal");
-
-        if (adminModal) {
-        adminModal.style.display = "flex";
-
-        setTimeout(() => {
-        closeAdminModal();
-    }, 4000);
+    function closeAllModals() {
+        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
     }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const modals = document.querySelectorAll(".modal");
+
+        if (modals.length > 0) {
+            document.querySelectorAll(".close-btn").forEach(btn => {
+                btn.addEventListener("click", closeModal);
+            });
+
+            setTimeout(() => closeModal(), 5000);
+        }
     });
-
-        function closeAdminModal() {
-        const modal = document.getElementById("adminSuccessModal");
-        if (modal) modal.style.display = "none";
-    }
 
     function copyGeneratedLink() {
         const input = document.getElementById("generatedRegistrationLink");
-
-        if (!input) {
-            alert("Länken kunde inte hittas.");
-            return;
-        }
-
+        if (!input) return alert("Länken kunde inte hittas.");
         navigator.clipboard.writeText(input.value)
-            .then(() => {
-                alert("Länk kopierad: " + input.value);
-            })
-            .catch(err => {
-                console.error("Kunde inte kopiera länken:", err);
-                alert("Ett fel uppstod vid kopiering.");
-            });
+            .then(() => alert("Länk kopierad: " + input.value))
+            .catch(err => alert("Ett fel uppstod vid kopiering."));
     }
-
 
     function copyLink(inputId) {
         const input = document.getElementById(inputId);
         if (input) {
             navigator.clipboard.writeText(input.value)
                 .then(() => alert("Länk kopierad: " + input.value))
-                .catch(err => alert("Misslyckades att kopiera länk."));
+                .catch(() => alert("Misslyckades att kopiera länk."));
         }
     }
 
@@ -556,7 +535,6 @@
     function closeEditProductModal() {
         document.getElementById("editProductModal").style.display = "none";
     }
-
 </script>
 </body>
 </html>

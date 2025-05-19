@@ -24,7 +24,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/org-admin/**").hasRole("ORG_ADMIN")
@@ -37,7 +36,11 @@ public class SecurityConfig {
                         .usernameParameter("email")
                         .passwordParameter("password")
                         .successHandler(loginSuccessHandler)
-                        .failureUrl("/?error")
+//                        .failureUrl("/?error")
+                                .failureHandler((request, response, exception) -> {
+                                    System.out.println(" Inloggning misslyckades: " + exception.getMessage());
+                                    response.sendRedirect("/?error");
+                                })
                         .permitAll()
                 )
                 .logout(logout -> logout

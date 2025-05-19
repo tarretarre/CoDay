@@ -9,10 +9,10 @@
 
 <div class="header" id="myHeader">
   <nav>
-    <a href="#home-section" class="home-btn">Hem</a>
-    <a href="#info-section" class="info-btn">Hur fungerar Co Day?</a>
-    <a href="#login-section" class="login-btn">Logga in</a>
-    <a href="#support-section" class="support-btn">Support</a>
+    <a href="#home-section" class="header-btn">Hem</a>
+    <a href="#info-section" class="header-btn">Hur fungerar Co Day?</a>
+    <a href="#login-section" class="header-btn">Logga in</a>
+    <a href="#support-section" class="header-btn">Support</a>
   </nav>
 </div>
 
@@ -143,38 +143,15 @@
   <div class="footer">Co Day 2025</div>
 </footer>
 
+<div th:replace="fragments/modal :: body"></div>
+
+<script src="/js/modals.js"></script>
 <script>
   function resetJoinForm() {
     const form = document.getElementById('joinForm');
     form.reset();
     window.location.hash = '#join-section';
   }
-
-  function closeModal() {
-    const success = document.getElementById("successModal");
-    const error = document.getElementById("errorModal");
-
-    if (success) success.style.display = "none";
-    if (error) error.style.display = "none";
-  }
-
-  window.addEventListener("DOMContentLoaded", () => {
-    const successModal = document.getElementById("successModal");
-    const errorModal = document.getElementById("errorModal");
-
-    if (successModal) {
-      setTimeout(() => {
-        closeModal();
-      }, 5000);
-    }
-
-    if (errorModal) {
-      window.location.hash = "#login-section";
-      setTimeout(() => {
-        closeModal();
-      }, 3000);
-    }
-  });
 </script>
 </body>
 </html>

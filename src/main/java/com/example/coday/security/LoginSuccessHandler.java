@@ -2,6 +2,7 @@ package com.example.coday.security;
 
 import com.example.coday.model.User;
 import com.example.coday.repository.UserRepo;
+import jakarta.servlet.ServletException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -21,14 +22,22 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     }
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request,
-                                        HttpServletResponse response,
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetails.getUser();
 
-        User user = ((com.example.coday.security.CustomUserDetails) authentication.getPrincipal()).getUser();
         user.setLastLogin(LocalDateTime.now());
         userRepo.save(user);
 
-        response.sendRedirect("/redirect-by-role");
+        String redirectURL = switch (user.getRole().name()) {
+            case "ADMIN" -> "/admin/dashboard";
+            case "ORG_ADMIN" -> "/org-admin/dashboard";
+            case "USER" -> "/user/dashboard";
+            default -> "/";
+        };
+
+        response.sendRedirect(redirectURL);
     }
+
 }

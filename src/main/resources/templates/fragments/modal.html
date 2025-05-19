@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="sv" xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+
+<div id="successModal" class="modal" th:if="${success}" style="display:flex;">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <p th:text="${success}">Meddelande</p>
+    </div>
+</div>
+
+<div id="errorModal" class="modal" th:if="${error}" style="display:flex;">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <p th:text="${error}">Felmeddelande</p>
+    </div>
+</div>
+
+</body>
+</html>

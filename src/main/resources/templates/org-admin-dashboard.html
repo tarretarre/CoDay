@@ -10,15 +10,15 @@
 
 <div class="header" id="myHeader">
   <nav>
-    <a href="#summary-section" class="home-btn">Summering</a>
-    <a href="#user-status-section" class="home-btn">Användare</a>
-    <a href="#role-section" class="login-btn">Rollförfrågan</a>
-    <a href="#product-upload-section" class="login-btn">Skapa belöning</a>
-    <a href="#product-list-section" class="login-btn">Belöningar</a>
-    <a href="#purchases-section" class="login-btn">Inlösta belöningar</a>
-    <a href="#" class="home-btn" onclick="copyRegistrationLink(); return false;">Registreringslänk</a>
+    <a href="#summary-section" class="header-btn">Summering</a>
+    <a href="#user-status-section" class="header-btn">Användare</a>
+    <a href="#role-section" class="header-btn">Rollförfrågan</a>
+    <a href="#product-upload-section" class="header-btn">Skapa belöning</a>
+    <a href="#product-list-section" class="header-btn">Belöningar</a>
+    <a href="#purchases-section" class="header-btn">Inlösta belöningar</a>
+    <a href="#" class="header-btn" onclick="copyRegistrationLink(); return false;">Registreringslänk</a>
     <form th:action="@{/logout}" method="post">
-      <button type="submit" class="login-btn">Logga ut</button>
+      <button type="submit" class="logout-btn">Logga ut</button>
     </form>
   </nav>
 </div>
@@ -272,7 +272,9 @@
     </div>
   </div>
 
+  <div th:replace="fragments/modal :: body"></div>
 
+  <script src="/js/modals.js"></script>
   <script>
     function openEditProductModal(id, name, pointsCost) {
       document.getElementById("editProductId").value = id;
@@ -348,11 +350,6 @@
 
     document.getElementById('editUserModal').style.display = 'flex';
   }
-
-  function closeEditModal() {
-    document.getElementById('editUserModal').style.display = 'none';
-  }
-
 </script>
 
 </body>

@@ -167,7 +167,7 @@ public class OrgAdminDashboardController {
             redirectAttributes.addFlashAttribute("error", "Ogiltig roll.");
         }
 
-        return "redirect:/org-admin/dashboard";
+        return "redirect:/org-admin/dashboard#role-section";
     }
 
     @PostMapping("/update-user")
