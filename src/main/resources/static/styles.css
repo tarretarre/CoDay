@@ -578,12 +578,14 @@ nav form button:hover {
 }
 
 .modal-content {
-    background: rgba(10, 34, 64, 0.75);
+    background: rgba(220, 220, 220, 0.75);
     padding: 20px 30px;
     border-radius: 8px;
     position: relative;
     max-width: 400px;
     text-align: center;
+    color: #0A2240;
+    font-weight: bold;
 }
 
 .close-btn {
