@@ -74,7 +74,7 @@ public class LoginIntegrationTest {
                         .user("email", "login@example.com")
                         .password("password", "securePassword"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/redirect-by-role"));
+                .andExpect(redirectedUrl("/user/dashboard"));
     }
 
     @Test
@@ -121,7 +121,7 @@ public class LoginIntegrationTest {
                         .user("email", unapprovedEmail)
                         .password("password", "securePassword"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/redirect-by-role"));
+                .andExpect(redirectedUrl("/user/dashboard"));
     }
 
     @Test
@@ -148,7 +148,7 @@ public class LoginIntegrationTest {
                         .user("email", userEmail)
                         .password("password", "securePassword"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/redirect-by-role"));
+                .andExpect(redirectedUrl("/user/dashboard"));
     }
 
     @Test
