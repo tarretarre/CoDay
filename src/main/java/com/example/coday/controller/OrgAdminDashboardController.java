@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +80,11 @@ public class OrgAdminDashboardController {
 
         model.addAttribute("admin", loggedInUser);
         model.addAttribute("companyName", loggedInUser.getCompany().getName());
-        model.addAttribute("registrationLink", "/register?token=" + loggedInUser.getCompany().getRegistrationToken());
+
+        String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+        String fullLink = baseUrl + "/register?token=" + loggedInUser.getCompany().getRegistrationToken();
+        model.addAttribute("registrationLink", fullLink);
+
         model.addAttribute("allUsers", allUsers);
         model.addAttribute("activeVisits", activeVisits);
         model.addAttribute("checkInTimes", checkInTimes);

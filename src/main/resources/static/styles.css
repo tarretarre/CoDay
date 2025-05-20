@@ -48,7 +48,9 @@ main {
 }
 
 .logo {
+    width: 15%;
     max-width: 600px;
+    min-width: 250px;
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
 }
 
