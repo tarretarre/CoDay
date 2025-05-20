@@ -16,8 +16,8 @@
         <a href="#product-list-section" class="header-btn">Belöningar</a>
         <a href="#purchases-section" class="header-btn">Inlösta belöningar</a>
         <a href="#support-section" class="header-btn">Support</a>
-        <form th:action="@{/logout}" method="post">
-            <button type="submit" class="logout-btn">Logga ut</button>
+        <form th:action="@{/logout}" method="post" style="display: inline-block;">
+            <button type="submit" class="header-btn btn-danger">Logga ut</button>
         </form>
     </nav>
 </div>
@@ -72,7 +72,7 @@
             <label for="newPassword">Nytt lösenord:</label>
             <input type="password" name="newPassword" id="newPassword" placeholder="Skriv nytt lösenord" required>
             <div class="button-group">
-                <button type="submit" class="submit-btn">Byt lösenord</button>
+                <button type="submit" class="body-btn">Byt lösenord</button>
             </div>
         </form>
     </section>
@@ -119,7 +119,7 @@
                     <td>
                         <form th:action="@{'/user/redeem/' + ${reward.id}}" method="post" style="display:inline;">
                             <input type="hidden" sec:csrfInput="true"/>
-                            <button type="submit" class="submit-btn">
+                            <button type="submit" class="body-btn">
                                 Lös in
                             </button>
                         </form>
@@ -159,7 +159,7 @@
         <form th:action="@{/support}" method="post">
             <input type="hidden" sec:csrfInput="true"/>
             <textarea name="message" placeholder="Beskriv ditt ärende"></textarea><br>
-            <button type="submit" class="submit-btn">Skicka</button>
+            <button type="submit" class="body-btn">Skicka</button>
         </form>
     </section>
 

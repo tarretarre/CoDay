@@ -17,8 +17,8 @@
     <a href="#product-list-section" class="header-btn">Belöningar</a>
     <a href="#purchases-section" class="header-btn">Inlösta belöningar</a>
     <a href="#" class="header-btn" onclick="copyRegistrationLink(); return false;">Registreringslänk</a>
-    <form th:action="@{/logout}" method="post">
-      <button type="submit" class="logout-btn">Logga ut</button>
+    <form th:action="@{/logout}" method="post" style="display: inline-block;">
+      <button type="submit" class="header-btn btn-danger">Logga ut</button>
     </form>
   </nav>
 </div>
@@ -30,9 +30,12 @@
 
 <main class="admin-container">
   <section id="summary-section" class="summary-section">
-    <div class="summary-card">Användare: <span th:text="${allUsers.size()}"></span></div>
-    <div class="summary-card">Närvarande just nu: <span th:text="${activeVisits.size()}"></span></div>
-    <div class="summary-card">Rollförfrågningar: <span th:text="${roleRequests.size()}"></span></div>
+    <h2>Summering</h2>
+    <div class="summary-cards">
+      <div class="summary-card">Användare: <span th:text="${allUsers.size()}"></span></div>
+      <div class="summary-card">Närvarande just nu: <span th:text="${activeVisits.size()}"></span></div>
+      <div class="summary-card">Rollförfrågningar: <span th:text="${roleRequests.size()}"></span></div>
+    </div>
   </section>
 
   <section id="user-status-section" class="user-status-section">
@@ -61,7 +64,7 @@
             <span th:if="${!activeVisits.containsKey(user.id)}">Ej incheckad</span>
           </td>
           <td>
-            <button type="button" class="submit-btn"
+            <button type="button" class="body-btn"
                     th:attr="onclick='openEditModal(' + ${user.id} + ')'">Redigera</button>
           </td>
         </tr>
@@ -99,7 +102,7 @@
             <div class="button-group">
               <form method="post" th:action="@{/org-admin/approve-role}" th:id="'approveForm__' + ${user.id}" style="display:inline;">
                 <input type="hidden" name="userId" th:value="${user.id}" />
-                <button type="submit" class="submit-btn">Godkänn</button>
+                <button type="submit" class="body-btn">Godkänn</button>
               </form>
               <form method="post" th:action="@{/org-admin/delete-user}" style="display:inline;">
                 <input type="hidden" name="userId" th:value="${user.id}" />
@@ -118,6 +121,7 @@
     <h2>Lägg till ny produkt</h2>
 
     <form th:action="@{/org-admin/products/upload}" method="post" enctype="multipart/form-data">
+      <input type="hidden" sec:csrfInput="true"/>
       <div>
         <label for="name">Produktnamn:</label>
         <input type="text" id="name" name="name" required>
@@ -134,7 +138,7 @@
       </div>
 
       <div>
-        <button type="submit" class="submit-btn">Lägg till produkt</button>
+        <button type="submit" class="body-btn">Lägg till produkt</button>
       </div>
     </form>
 
@@ -160,7 +164,7 @@
           <td th:text="${product.name}"></td>
           <td th:text="${product.pointsCost}"></td>
           <td>
-            <button type="button" class="submit-btn"
+            <button type="button" class="body-btn"
                     th:attr="onclick=|openEditProductModal('${product.id}', '${product.name}', '${product.pointsCost}')|">
               Redigera
             </button>
@@ -174,7 +178,7 @@
     </div>
   </section>
 
-  <section id="purchases-section" class="purchases">
+  <section id="purchases-section" class="purchases-section">
     <h2>Inlösta belöningar</h2>
     <table class="status-table">
       <thead>
@@ -199,7 +203,7 @@
           <form th:if="${!purchase.delivered}" method="post"
                 th:action="@{'/org-admin/mark-delivered/' + ${purchase.id}}">
             <input type="hidden" sec:csrfInput="true"/>
-            <button type="submit">Markera som levererad</button>
+            <button type="submit" class="body-btn">Markera som levererad</button>
           </form>
         </td>
       </tr>
@@ -233,7 +237,7 @@
         </div>
 
         <div>
-          <button type="submit" class="submit-btn">Spara ändringar</button>
+          <button type="submit" class="body-btn">Spara ändringar</button>
         </div>
       </form>
     </div>
@@ -258,7 +262,7 @@
         <input type="password" name="newPassword" id="editPassword" placeholder="Nytt lösenord (valfritt)" />
 
         <div class="button-group">
-          <button type="submit" class="submit-btn">Spara</button>
+          <button type="submit" class="body-btn">Spara</button>
         </div>
       </form>
 

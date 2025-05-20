@@ -64,21 +64,6 @@ main section {
     width: 100vw;
 }
 
-/*.header-btn {*/
-/*    color: white;*/
-/*    text-decoration: none;*/
-/*    font-weight: bold;*/
-/*    background-color: rgba(255, 255, 255, 0.15);*/
-/*    padding: 10px 25px;*/
-/*    border-radius: 25px;*/
-/*    transition: background-color 0.3s ease;*/
-/*    border: 0;*/
-/*}*/
-
-/*.header-btn:hover {*/
-/*    background-color: #805374;*/
-/*}*/
-
 .header-btn {
     color: white;
     text-decoration: none;
@@ -98,25 +83,9 @@ main section {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.logout-btn {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    background-color: rgba(255, 0, 0, 0.60);
-    padding: 10px 25px;
-    border-radius: 25px;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(255, 0, 0, 0.2);
-    transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.2s ease;
-}
-
-.logout-btn:hover {
+.btn-danger:hover {
     background-color: red;
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(255, 0, 0, 0.2);
 }
-
 
 .apply-btn {
     display: inline-block;
@@ -131,20 +100,6 @@ main section {
 }
 
 .apply-btn:hover {
-    background-color: #805374;
-}
-
-.submit-btn {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    background-color: rgba(255, 255, 255, 0.15);
-    padding: 10px 25px;
-    border-radius: 25px;
-    transition: background-color 0.3s ease;
-}
-
-.submit-btn:hover {
     background-color: #805374;
 }
 
@@ -185,6 +140,7 @@ main section {
     padding: 10px 25px;
     border-radius: 25px;
     transition: background-color 0.3s ease;
+    border: 0;
 }
 
 .clear-btn:hover {
@@ -342,31 +298,6 @@ input:invalid {
     margin-top: 5px;
 }
 
-.modal {
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: fadeIn 0.3s ease-in;
-}
-
-.modal-content {
-    background-color: #fff;
-    color: #333;
-    padding: 30px 20px;
-    border-radius: 10px;
-    text-align: center;
-    max-width: 400px;
-    width: 90%;
-    position: relative;
-}
-
 .close-btn {
     position: absolute;
     top: 10px;
@@ -386,11 +317,20 @@ input:invalid {
 }
 
 .scroll-container {
-    max-height: 300px;
+    max-height: 600px;
     overflow-y: auto;
     border: 1px solid #ddd;
     border-radius: 4px;
     overflow-x: auto;
+}
+
+#company-section .scroll-container,
+#user-status-section .scroll-container,
+#admin-section .scroll-container,
+#role-section .scroll-container,
+#product-list-section .scroll-container,
+#purchases-section .scroll-container {
+    max-height: 600px;
 }
 
 .status-table {
@@ -406,14 +346,13 @@ input:invalid {
 }
 
 .status-active {
-    background-color: #e2ffe2;
+    background-color: #7faf7f;
     color: #155724;
     font-weight: bold;
 }
 
 .status-inactive {
-    background-color: #f2f2f2;
-    color: #666;
+    color: #ddd;
 }
 
 .admin-section {
@@ -433,7 +372,6 @@ nav form {
 }
 
 nav form button {
-    all: unset;
     cursor: pointer;
     font-weight: bold;
     padding: 10px 25px;
@@ -456,7 +394,6 @@ nav form button:hover {
 }
 
 .submit-btn {
-    all: unset;
     cursor: pointer;
     font-weight: bold;
     padding: 10px 25px;
@@ -468,21 +405,6 @@ nav form button:hover {
 
 .submit-btn:hover {
     background-color: #805374;
-}
-
-.clear-btn {
-    all: unset;
-    cursor: pointer;
-    font-weight: bold;
-    padding: 10px 25px;
-    border-radius: 25px;
-    background-color: rgba(255, 255, 255, 0.15);
-    color: white;
-    transition: background-color 0.3s ease;
-}
-
-.clear-btn:hover {
-    background-color: red;
 }
 
 .admin-section form {
@@ -531,11 +453,11 @@ nav form button:hover {
 }
 
 .check-in-btn {
-    background-color: #28a745; /* grön */
+    background-color: #28a745;
 }
 
 .check-out-btn {
-    background-color: #dc3545; /* röd */
+    background-color: #dc3545;
 }
 
 .check-btn:hover {
@@ -543,6 +465,12 @@ nav form button:hover {
 }
 
 .status-section {
+    max-height: 100vh;
+    overflow-y: auto;
+    padding-top: 100px;
+}
+
+.user-status-section {
     max-height: 100vh;
     overflow-y: auto;
     padding-top: 100px;
@@ -623,29 +551,6 @@ nav form button:hover {
     margin-top: 4px;
 }
 
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 999;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal-content {
-    background: #fff;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.2);
-    max-width: 400px;
-    text-align: center;
-    position: relative;
-}
-
 .close-btn {
     position: absolute;
     top: 8px;
@@ -656,7 +561,7 @@ nav form button:hover {
 }
 
 .success-message, .error-message {
-    display: none !important; /* Dölj gamla inline-meddelanden */
+    display: none !important;
 }
 
 .modal {
@@ -673,7 +578,7 @@ nav form button:hover {
 }
 
 .modal-content {
-    background-color: #fff;
+    background: rgba(10, 34, 64, 0.75);
     padding: 20px 30px;
     border-radius: 8px;
     position: relative;
@@ -689,12 +594,16 @@ nav form button:hover {
     cursor: pointer;
 }
 
+h1 {
+    color: #DDD;
+}
+
 h2 {
     margin-bottom: 10px;
 }
 
-h1 {
-    color: #FFF;
+h3 {
+    color: #DDD;
 }
 
 textarea {
@@ -715,4 +624,47 @@ textarea:focus {
     outline: none;
     border-color: #805374;
     box-shadow: 0 0 5px rgba(128, 83, 116, 0.5);
+}
+
+.summary-section {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    max-height: 100vh;
+    overflow-y: auto;
+    padding-top: 100px;
+}
+
+.summary-card {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 20px;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    max-width: 300px;
+    text-align: center;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+    max-height: 100px;
+}
+
+.summary-card:hover {
+    transform: translateY(-5px);
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.summary-section h2 {
+    color: white;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.summary-cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
 }
