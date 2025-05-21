@@ -272,7 +272,7 @@ public class OrgAdminDashboardController {
         purchase.setDelivered(true);
         purchaseRepo.save(purchase);
         redirectAttributes.addFlashAttribute("success", "Belöningen har markerats som levererad.");
-        return "redirect:/org-admin/dashboard";
+        return "redirect:/org-admin/dashboard#purchases-section";
     }
 
 
