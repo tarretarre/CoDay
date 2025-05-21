@@ -17,13 +17,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.userRepo = userRepo;
     }
 
-//    @Override
-//    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-//        User user = userRepo.findByEmail(email)
-//                .orElseThrow(() -> new UsernameNotFoundException("Användare hittades inte med e-post: " + email));
-//        return new CustomUserDetails(user);
-//    }
-
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         System.out.println("Försöker ladda användare med e-post: " + email);
