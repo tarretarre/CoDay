@@ -10,6 +10,7 @@
 
 <div class="header" id="myHeader">
   <nav>
+    <a href="/org-admin/dashboard" class="header-btn">Hem</a>
     <a href="#summary-section" class="header-btn">Summering</a>
     <a href="#user-status-section" class="header-btn">Användare</a>
     <a href="#role-section" class="header-btn">Rollförfrågan</a>
@@ -64,6 +65,15 @@
             <span th:if="${!activeVisits.containsKey(user.id)}">Ej incheckad</span>
           </td>
           <td>
+            <form th:action="@{/org-admin/check-in}" method="post" th:if="${!activeVisits.containsKey(user.id)}" style="display:inline;">
+              <input type="hidden" name="userId" th:value="${user.id}" />
+              <button type="submit" class="body-btn">Checka in</button>
+            </form>
+
+            <form th:action="@{/org-admin/check-out}" method="post" th:if="${activeVisits.containsKey(user.id)}" style="display:inline;">
+              <input type="hidden" name="userId" th:value="${user.id}" />
+              <button type="submit" class="clear-btn">Checka ut</button>
+            </form>
             <button type="button" class="body-btn"
                     th:attr="onclick='openEditModal(' + ${user.id} + ')'">Redigera</button>
           </td>

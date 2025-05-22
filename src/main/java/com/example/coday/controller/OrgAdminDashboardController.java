@@ -275,5 +275,29 @@ public class OrgAdminDashboardController {
         return "redirect:/org-admin/dashboard#purchases-section";
     }
 
+    @PostMapping("/check-in")
+    public String checkInUser(@RequestParam Long userId, RedirectAttributes redirectAttributes) {
+        Optional<User> userOpt = userRepo.findById(userId);
+        if (userOpt.isPresent() && !visitRepo.existsByUserAndCheckOutTimeIsNull(userOpt.get())) {
+            Visit visit = new Visit();
+            visit.setUser(userOpt.get());
+            visit.setCheckInTime(java.time.LocalDateTime.now());
+            visitRepo.save(visit);
+            redirectAttributes.addFlashAttribute("success", "Användaren har checkats in.");
+        }
+        return "redirect:/org-admin/dashboard#user-status-section";
+    }
 
+    @PostMapping("/check-out")
+    public String checkOutUser(@RequestParam Long userId, RedirectAttributes redirectAttributes) {
+        Optional<User> userOpt = userRepo.findById(userId);
+        if (userOpt.isPresent()) {
+            visitRepo.findByUserAndCheckOutTimeIsNull(userOpt.get()).ifPresent(visit -> {
+                visit.setCheckOutTime(java.time.LocalDateTime.now());
+                visitRepo.save(visit);
+            });
+            redirectAttributes.addFlashAttribute("success", "Användaren har checkats ut.");
+        }
+        return "redirect:/org-admin/dashboard#user-status-section";
+    }
 }

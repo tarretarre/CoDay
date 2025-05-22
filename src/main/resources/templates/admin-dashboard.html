@@ -9,6 +9,7 @@
 
 <div class="header" id="myHeader">
     <nav>
+        <a href="/admin/dashboard" class="header-btn">Hem</a>
         <a href="#summary-section" class="header-btn">Summering</a>
         <a href="#company-section" class="header-btn">Företag</a>
         <a href="#user-status-section" class="header-btn">Användare</a>
@@ -72,7 +73,7 @@
                         <div th:if="${company.registrationToken != null}">
                             <input type="hidden"
                                    th:id="'copy-link-' + ${company.id}"
-                                   th:value="${'/register?token=' + company.registrationToken}" />
+                                   th:value="${baseUrl + '/register?token=' + company.registrationToken}" />
                             <button type="button"
                                     th:attr="onclick=|copyLink('copy-link-' + ${company.id})|"
                                     class="body-btn">
@@ -92,17 +93,6 @@
             </table>
         </div>
     </section>
-
-
-    <div th:if="${generatedToken}" class="existing-link-box" style="margin-top: 30px;">
-        <h3>Länk existerar för <span th:text="${generatedCompany}">Företag</span></h3>
-        <p>Du kan kopiera länken nedan och skicka till användaren:</p>
-        <input type="text"
-               th:value="${'/register?token=' + generatedToken}"
-               readonly
-               style="width: 100%; padding: 10px; margin-bottom: 10px;" />
-        <button type="button" onclick="copyGeneratedLink()" class="body-btn">Kopiera länk</button>
-    </div>
 
     <section id="user-status-section" class="user-status-section">
         <h2>Status</h2>
@@ -132,6 +122,15 @@
                         <span th:if="${!activeVisits.containsKey(user.id)}">Ej incheckad</span>
                     </td>
                     <td>
+                        <form th:action="@{/admin/check-in}" method="post" th:if="${!activeVisits.containsKey(user.id)}" style="display:inline;">
+                            <input type="hidden" name="userId" th:value="${user.id}" />
+                            <button type="submit" class="body-btn">Checka in</button>
+                        </form>
+
+                        <form th:action="@{/admin/check-out}" method="post" th:if="${activeVisits.containsKey(user.id)}" style="display:inline;">
+                            <input type="hidden" name="userId" th:value="${user.id}" />
+                            <button type="submit" class="clear-btn">Checka ut</button>
+                        </form>
                         <button type="button" class="body-btn" th:attr="onclick='openEditModal(' + ${user.id} + ')'">Redigera</button>
                     </td>
                 </tr>
@@ -409,7 +408,11 @@
     <div class="modal-content">
         <span class="close-btn" onclick="closeTokenModal()">&times;</span>
         <h3>Registreringslänk för <span th:text="${generatedCompany}">Företag</span></h3>
-        <input type="text" id="generatedRegistrationLink" th:value="${'/register?token=' + generatedToken}" readonly style="width: 100%; padding: 10px; margin-top: 10px;" />
+        <input type="text"
+                id="generatedRegistrationLink"
+                th:value="${generatedLink}"
+                readonly
+                style="width: 100%; padding: 10px; margin-bottom: 10px;" />
         <button type="button" onclick="copyGeneratedLink()" class="body-btn" style="margin-top: 10px;">Kopiera länk</button>
     </div>
 </div>

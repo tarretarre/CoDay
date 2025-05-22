@@ -3,13 +3,13 @@ package com.example.coday.controller;
 import com.example.coday.model.Company;
 import com.example.coday.model.User;
 import com.example.coday.repository.CompanyRepo;
-import com.example.coday.repository.UserRepo;
 import com.example.coday.security.CustomUserDetails;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -61,8 +61,12 @@ public class RegistrationTokenController {
         company.setRegistrationToken(newToken);
         companyRepo.save(company);
 
+        String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+        String fullLink = baseUrl + "/register?token=" + newToken;
+
         redirectAttributes.addFlashAttribute("generatedToken", newToken);
         redirectAttributes.addFlashAttribute("generatedCompany", company.getName());
+        redirectAttributes.addFlashAttribute("generatedLink", fullLink);
 
         return "redirect:/admin/dashboard";
     }

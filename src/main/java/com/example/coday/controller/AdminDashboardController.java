@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -96,6 +97,9 @@ public class AdminDashboardController {
         model.addAttribute("products", productRepo.findAll());
         model.addAttribute("purchases", allPurchases);
 
+        String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+        model.addAttribute("baseUrl", baseUrl);
+
         return "admin-dashboard";
     }
 
@@ -170,11 +174,15 @@ public class AdminDashboardController {
 
     @PostMapping("/delete-company")
     public String deleteCompany(@RequestParam Long companyId, RedirectAttributes redirectAttributes) {
-        if (companyRepo.existsById(companyId)) {
-            companyRepo.deleteById(companyId);
-            redirectAttributes.addFlashAttribute("success", "Företaget har tagits bort.");
-        } else {
-            redirectAttributes.addFlashAttribute("error", "Företaget kunde inte hittas.");
+        try {
+            if (companyRepo.existsById(companyId)) {
+                companyRepo.deleteById(companyId);
+                redirectAttributes.addFlashAttribute("success", "Företaget har tagits bort.");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Företaget kunde inte hittas.");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Det går inte att ta bort företaget eftersom användare eller historik är kopplade.");
         }
         return "redirect:/admin/dashboard#company-section";
     }
@@ -246,14 +254,19 @@ public class AdminDashboardController {
         Optional<User> userOpt = userRepo.findById(userId);
 
         if (userOpt.isPresent()) {
-            userRepo.deleteById(userId);
-            redirectAttributes.addFlashAttribute("success", "Användaren har tagits bort.");
+            try {
+                userRepo.deleteById(userId);
+                redirectAttributes.addFlashAttribute("success", "Användaren har tagits bort.");
+            } catch (Exception e) {
+                redirectAttributes.addFlashAttribute("error", "Det går inte att ta bort användaren eftersom historik eller besök är kopplade.");
+            }
         } else {
             redirectAttributes.addFlashAttribute("error", "Användaren kunde inte hittas.");
         }
 
         return "redirect:/admin/dashboard#user-status-section";
     }
+
 
     @PostMapping("/force-reset-password")
     public String forceResetPassword(@RequestParam String email,
@@ -270,6 +283,32 @@ public class AdminDashboardController {
         }
 
         return "redirect:/admin/dashboard#reset-section";
+    }
+
+    @PostMapping("/check-in")
+    public String checkInUser(@RequestParam Long userId, RedirectAttributes redirectAttributes) {
+        Optional<User> userOpt = userRepo.findById(userId);
+        if (userOpt.isPresent() && !visitRepo.existsByUserAndCheckOutTimeIsNull(userOpt.get())) {
+            Visit visit = new Visit();
+            visit.setUser(userOpt.get());
+            visit.setCheckInTime(java.time.LocalDateTime.now());
+            visitRepo.save(visit);
+            redirectAttributes.addFlashAttribute("success", "Användaren har checkats in.");
+        }
+        return "redirect:/admin/dashboard#user-status-section";
+    }
+
+    @PostMapping("/check-out")
+    public String checkOutUser(@RequestParam Long userId, RedirectAttributes redirectAttributes) {
+        Optional<User> userOpt = userRepo.findById(userId);
+        if (userOpt.isPresent()) {
+            visitRepo.findByUserAndCheckOutTimeIsNull(userOpt.get()).ifPresent(visit -> {
+                visit.setCheckOutTime(java.time.LocalDateTime.now());
+                visitRepo.save(visit);
+            });
+            redirectAttributes.addFlashAttribute("success", "Användaren har checkats ut.");
+        }
+        return "redirect:/admin/dashboard#user-status-section";
     }
 
 
